@@ -8,20 +8,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --negro: #F5F0EB;
-    --gris-oscuro: #FDFAF7;
-    --gris-card: #EDE8E3;
-    --gris-borde: #D5CEC7;
-    --amarillo: #C8522A;
-    --amarillo-hover: #B8441C;
-    --violeta: #5B4A3F;
-    --naranja: #C8522A;
-    --blanco: #1A1614;
-    --gris-texto: #7A6E68;
-    --rojo: #B83232;
-    --verde: #3A7D44;
-    --trebol: #C8522A;
+    --negro: #0E1726;
+    --gris-oscuro: #131E33;
+    --gris-card: #1A2640;
+    --gris-borde: #2A3858;
+    --amarillo: #E8582B;
+    --amarillo-hover: #D14A20;
+    --violeta: #A9B8D8;
+    --naranja: #E8582B;
+    --blanco: #F4F1EA;
+    --gris-texto: #9AA6BF;
+    --rojo: #FF6B5E;
+    --verde: #5BC27A;
+    --trebol: #E8582B;
   }
+
+
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:999;opacity:.07;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");}
+  .page-title,.section-title,header h1{text-transform:uppercase;font-weight:400}
+  .stat-label{text-transform:uppercase;letter-spacing:1.5px}
+  .nav-tab.active,.btn-primary{box-shadow:0 0 0 1px rgba(244,241,234,.15)}
+  .logo-circle{border:2px solid var(--blanco)}
+  .tag-precio{display:inline-block;background:var(--trebol);color:var(--blanco);font-family:'Bebas Neue',sans-serif;letter-spacing:1px;padding:2px 10px;border-radius:4px;transform:rotate(-2deg)}
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -137,9 +146,9 @@
   .sidebar-item:hover { background: var(--gris-card); color: var(--blanco); }
 
   .sidebar-item.active {
-    background: rgba(46, 125, 50, 0.12);
+    background: rgba(232,88,43,0.14);
     color: var(--trebol);
-    border-color: rgba(46, 125, 50, 0.3);
+    border-color: rgba(232,88,43,0.35);
   }
 
   .sidebar-item .icon { font-size: 1rem; width: 20px; text-align: center; }
@@ -155,7 +164,7 @@
   }
 
   .sidebar-item.active .badge {
-    background: rgba(46, 125, 50, 0.2);
+    background: rgba(232,88,43,0.22);
     color: var(--trebol);
   }
 
@@ -212,12 +221,12 @@
   }
   .btn-ghost:hover { background: var(--gris-card); color: var(--blanco); }
 
-  .btn-danger { background: rgba(232,64,64,0.1); color: var(--rojo); border: 1px solid rgba(232,64,64,0.2); }
-  .btn-danger:hover { background: rgba(232,64,64,0.2); }
+  .btn-danger { background: rgba(255,107,94,0.1); color: var(--rojo); border: 1px solid rgba(255,107,94,0.2); }
+  .btn-danger:hover { background: rgba(255,107,94,0.2); }
 
   .btn-sm { padding: 0.3rem 0.75rem; font-size: 0.8rem; }
   .btn-violeta { background: var(--violeta); color: var(--blanco); }
-  .btn-violeta:hover { background: #7040b0; }
+  .btn-violeta:hover { background: #8A9BC0; }
 
   /* ── CARDS GRID ── */
   .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
@@ -231,7 +240,7 @@
     transition: border-color 0.2s;
   }
 
-  .card:hover { border-color: rgba(245,168,0,0.3); }
+  .card:hover { border-color: rgba(232,88,43,0.3); }
 
   .card-header {
     display: flex;
@@ -264,11 +273,11 @@
     font-weight: 500;
   }
 
-  .chip-amarillo { background: rgba(46,125,50,0.15); color: var(--trebol); }
-  .chip-violeta { background: rgba(91,74,63,0.15); color: var(--violeta); }
-  .chip-naranja { background: rgba(200,82,42,0.12); color: var(--naranja); }
-  .chip-verde { background: rgba(76,175,80,0.15); color: var(--verde); }
-  .chip-rojo { background: rgba(232,64,64,0.15); color: var(--rojo); }
+  .chip-amarillo { background: rgba(232,88,43,0.18); color: var(--trebol); }
+  .chip-violeta { background: rgba(169,184,216,0.15); color: var(--violeta); }
+  .chip-naranja { background: rgba(232,88,43,0.16); color: var(--naranja); }
+  .chip-verde { background: rgba(91,194,122,0.15); color: var(--verde); }
+  .chip-rojo { background: rgba(255,107,94,0.15); color: var(--rojo); }
   .chip-gris { background: var(--gris-borde); color: var(--gris-texto); }
 
   .prof-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 0.5rem; }
@@ -283,7 +292,7 @@
 
   table { width: 100%; border-collapse: collapse; }
 
-  thead { background: rgba(200,82,42,0.06); }
+  thead { background: rgba(232,88,43,0.08); }
 
   th {
     padding: 0.75rem 1rem;
@@ -299,7 +308,7 @@
   td {
     padding: 0.8rem 1rem;
     font-size: 0.875rem;
-    border-bottom: 1px solid rgba(42,42,42,0.6);
+    border-bottom: 1px solid rgba(42,56,88,0.7);
     vertical-align: middle;
   }
 
@@ -460,7 +469,7 @@
   }
 
   .stat-value.amarillo { color: var(--trebol); }
-  .stat-value.violeta { color: #c084fc; }
+  .stat-value.violeta { color: #A9B8D8; }
   .stat-value.verde { color: var(--verde); }
 
   /* ── LIQUIDACION ── */
@@ -539,8 +548,8 @@
     max-width: 320px;
   }
 
-  .toast.success { border-color: rgba(76,175,80,0.4); }
-  .toast.error { border-color: rgba(232,64,64,0.4); }
+  .toast.success { border-color: rgba(91,194,122,0.4); }
+  .toast.error { border-color: rgba(255,107,94,0.4); }
 
   @keyframes slideIn {
     from { transform: translateX(100%); opacity: 0; }
@@ -552,8 +561,8 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(91,45,142,0.2);
-    color: #c084fc;
+    background: rgba(169,184,216,0.2);
+    color: #A9B8D8;
     padding: 3px 10px;
     border-radius: 20px;
     font-size: 0.75rem;
@@ -676,12 +685,13 @@
 
 <!-- HEADER -->
 <header>
-  <div class="logo-circle">
-    <div class="logo-text" style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:white;letter-spacing:1px">B</div>
+  <div class="logo-circle" style="width:46px;height:46px;flex-direction:column;line-height:1;gap:1px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:.5px;color:#F4F1EA">BRAVA</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:6px;letter-spacing:1px;color:#F4F1EA">TEATRO</div>
   </div>
   <div>
     <h1>BRA<span>VA</span></h1>
-    <div style="font-size:0.65rem;letter-spacing:3px;color:var(--gris-texto);text-transform:uppercase;margin-top:-4px">Espacio Cultural</div>
+    <div style="font-size:0.65rem;letter-spacing:3px;color:var(--gris-texto);text-transform:uppercase;margin-top:-4px">Tu refugio creativo</div>
   </div>
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="switchModule('talleres')">Talleres</div>
@@ -1529,14 +1539,14 @@
         <input type="text" id="stock-unidad-venta" placeholder="Ej: vaso">
       </div>
     </div>
-    <div id="stock-costo-venta" style="background:rgba(245,168,0,0.08);border:1px solid rgba(245,168,0,0.2);border-radius:8px;padding:0.75rem;font-size:0.85rem;color:var(--amarillo);margin-bottom:0.75rem;display:none">
+    <div id="stock-costo-venta" style="background:rgba(232,88,43,0.08);border:1px solid rgba(232,88,43,0.2);border-radius:8px;padding:0.75rem;font-size:0.85rem;color:var(--amarillo);margin-bottom:0.75rem;display:none">
       💡 Costo por unidad de venta: <strong id="stock-costo-venta-valor">$0</strong>
     </div>
     <div class="form-group">
       <label>Cantidad comprada <span style="color:var(--gris-texto);font-size:0.7rem">(se suma al stock existente)</span></label>
       <input type="number" id="stock-cantidad" placeholder="0" min="0">
     </div>
-    <div style="background:rgba(245,168,0,0.08);border:1px solid rgba(245,168,0,0.2);border-radius:8px;padding:0.75rem;font-size:0.8rem;color:var(--gris-texto);margin-top:0.5rem">
+    <div style="background:rgba(232,88,43,0.08);border:1px solid rgba(232,88,43,0.2);border-radius:8px;padding:0.75rem;font-size:0.8rem;color:var(--gris-texto);margin-top:0.5rem">
       💡 Al guardar se registra automáticamente un egreso por el costo total de esta compra
     </div>
     <div class="modal-footer">
@@ -2183,7 +2193,7 @@ function renderDetalleTaller() {
     }
 
     return `
-    <tr style="${tieneDeudaPrev && !becadoTotal ? 'background:rgba(232,64,64,0.06);' : ''}${inactivo}">
+    <tr style="${tieneDeudaPrev && !becadoTotal ? 'background:rgba(255,107,94,0.06);' : ''}${inactivo}">
       <td>
         <strong>${a.Nombre}</strong>
         ${tieneDeudaPrev && !becadoTotal ? `<div style="font-size:0.7rem;color:var(--rojo);margin-top:2px">⚠ Debe $${formatNum(deudaPrev)} de ${meses[mesPrev]}</div>` : ''}
@@ -2221,7 +2231,7 @@ function renderDetalleTaller() {
       </td>
     </tr>
     <tr id="historial-${a.ID}" style="display:none">
-      <td colspan="8" style="padding:0.5rem 1rem 1rem;background:rgba(0,0,0,0.3)">
+      <td colspan="8" style="padding:0.5rem 1rem 1rem;background:rgba(0,0,0,0.25)">
         <div style="font-size:0.75rem;color:var(--gris-texto);margin-bottom:0.5rem;letter-spacing:1px;text-transform:uppercase">Historial de pagos</div>
         <div id="historial-content-${a.ID}"></div>
       </td>
@@ -2997,7 +3007,7 @@ async function generarLiquidacion() {
           </div>
           <div class="liq-monto">
             <div class="lbl">Honorarios</div>
-            <div class="val" style="color:#c084fc">$${formatNum(l.honorarios)}</div>
+            <div class="val" style="color:#A9B8D8">$${formatNum(l.honorarios)}</div>
           </div>
           <div class="liq-monto">
             <div class="lbl">Al espacio</div>
@@ -3265,7 +3275,7 @@ function renderETabReservas(ev, isCerrado) {
                 <td style="text-align:center">
                   ${!isCerrado
                     ? `<input type="number" min="0" max="${cantReservada}" value="${cantVino}"
-                        style="width:60px;text-align:center;background:${cantVino < cantReservada ? 'rgba(232,64,64,0.1)' : 'rgba(76,175,80,0.1)'};border-color:${cantVino < cantReservada ? 'rgba(232,64,64,0.4)' : 'rgba(76,175,80,0.4)'};color:${cantVino < cantReservada ? 'var(--rojo)' : 'var(--verde)'};border-radius:6px;padding:4px 6px;font-size:0.85rem"
+                        style="width:60px;text-align:center;background:${cantVino < cantReservada ? 'rgba(255,107,94,0.1)' : 'rgba(91,194,122,0.1)'};border-color:${cantVino < cantReservada ? 'rgba(255,107,94,0.4)' : 'rgba(91,194,122,0.4)'};color:${cantVino < cantReservada ? 'var(--rojo)' : 'var(--verde)'};border-radius:6px;padding:4px 6px;font-size:0.85rem"
                         onchange="actualizarAsistencia(${r.ID}, this.value, ${cantReservada}, this)">`
                     : `<span class="${cantVino < cantReservada ? 'chip chip-rojo' : 'chip chip-verde'}">${cantVino}</span>`
                   }
@@ -3325,8 +3335,8 @@ async function actualizarAsistencia(reservaId, cantVino, cantReservada, inputEl)
   if (isNaN(val) || val < 0) return;
   const cant = Math.min(val, cantReservada);
   inputEl.value = cant;
-  inputEl.style.background = cant < cantReservada ? 'rgba(232,64,64,0.1)' : 'rgba(76,175,80,0.1)';
-  inputEl.style.borderColor = cant < cantReservada ? 'rgba(232,64,64,0.4)' : 'rgba(76,175,80,0.4)';
+  inputEl.style.background = cant < cantReservada ? 'rgba(255,107,94,0.1)' : 'rgba(91,194,122,0.1)';
+  inputEl.style.borderColor = cant < cantReservada ? 'rgba(255,107,94,0.4)' : 'rgba(91,194,122,0.4)';
   inputEl.style.color = cant < cantReservada ? 'var(--rojo)' : 'var(--verde)';
 
   const res = await api('updateReserva', { id: reservaId, row: { 'Cantidad Vino': cant } });
@@ -3518,16 +3528,16 @@ function renderETabResultado(ev) {
     </div>
     <div class="section-title">DISTRIBUCIÓN</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div class="card" style="border-color:rgba(245,168,0,0.3)">
+      <div class="card" style="border-color:rgba(232,88,43,0.3)">
         <div style="font-size:0.7rem;color:var(--gris-texto);letter-spacing:1px;text-transform:uppercase;margin-bottom:0.5rem">Para el espacio</div>
         <div style="font-family:'Bebas Neue';font-size:2rem;color:var(--amarillo)">$${formatNum(totalEspacio)}</div>
         <div style="font-size:0.75rem;color:var(--gris-texto);margin-top:4px">
           ${modelo === 'porcentaje' ? `${ev['% Espacio']}% entradas` : modelo === 'alquiler' ? 'Alquiler fijo' : 'Sin entrada'} + gastro
         </div>
       </div>
-      <div class="card" style="border-color:rgba(91,45,142,0.3)">
+      <div class="card" style="border-color:rgba(169,184,216,0.3)">
         <div style="font-size:0.7rem;color:var(--gris-texto);letter-spacing:1px;text-transform:uppercase;margin-bottom:0.5rem">Para el organizador</div>
-        <div style="font-family:'Bebas Neue';font-size:2rem;color:#c084fc">$${formatNum(paraOrganizador)}</div>
+        <div style="font-family:'Bebas Neue';font-size:2rem;color:#A9B8D8">$${formatNum(paraOrganizador)}</div>
         <div style="font-size:0.75rem;color:var(--gris-texto);margin-top:4px">
           ${modelo === 'porcentaje' ? `${ev['% Organizador']}% entradas` : modelo === 'alquiler' ? 'Total entradas vendidas' : '-'}
         </div>
@@ -4151,6 +4161,147 @@ async function loadConfig() {
   }
 }
 
+
+// ── PUNTO DE EQUILIBRIO ──────────────────────────────────────
+function renderResultados() {
+  renderResultadosBase();
+  renderPE();
+  if (!state.costosFijosCargados) loadCostosFijos();
+}
+
+async function loadCostosFijos() {
+  state.costosFijosCargados = true;
+  const data = await api('getCostosFijos');
+  if (data && data.error) { state.costosFijosError = data.error; state.costosFijos = []; }
+  else { state.costosFijosError = null; state.costosFijos = Array.isArray(data) ? data : []; }
+  renderPE();
+}
+
+function peParams() {
+  let p = {};
+  try { p = JSON.parse(localStorage.getItem('brava_pe') || '{}'); } catch(e) {}
+  return { precio: p.precio || 15000, pctSala: p.pctSala ?? 40, funcionesMes: p.funcionesMes || 8 };
+}
+function peGuardarParams() {
+  const p = {
+    precio: parseFloat(document.getElementById('pe-precio').value) || 0,
+    pctSala: parseFloat(document.getElementById('pe-pct').value) || 0,
+    funcionesMes: parseFloat(document.getElementById('pe-func').value) || 1
+  };
+  try { localStorage.setItem('brava_pe', JSON.stringify(p)); } catch(e) {}
+  renderPE();
+}
+
+function renderPE() {
+  const el = document.getElementById('pe-contenido');
+  if (!el || !window._res) return;
+  const r = window._res;
+  const costos = state.costosFijos || [];
+  const totalFijo = costos.reduce((s,c) => s + (parseFloat(c.Monto) || 0), 0);
+  const hoy = new Date();
+  const meses = r.mes ? 1 : (r.anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12);
+  const fijoPeriodo = totalFijo * meses;
+  const ingreso = r.resTalleres + r.resEventos + r.ingresosExternos;
+  const cobertura = fijoPeriodo > 0 ? ingreso / fijoPeriodo * 100 : 0;
+  const falta = Math.max(0, fijoPeriodo - ingreso);
+  const color = fijoPeriodo === 0 ? 'var(--gris-texto)' : cobertura >= 100 ? 'var(--verde)' : cobertura >= 60 ? '#F2B134' : 'var(--rojo)';
+  const estado = fijoPeriodo === 0 ? 'Cargá tus costos fijos' : cobertura >= 100 ? 'EN EQUILIBRIO' : cobertura >= 60 ? 'CERCA' : 'LEJOS';
+  const p = peParams();
+  const netoEntrada = p.precio * (p.pctSala / 100);
+  const entradasFalta = netoEntrada > 0 ? Math.ceil(falta / netoEntrada) : 0;
+  const funcFalta = Math.ceil(entradasFalta / 40) || 0;
+  const tarifas = (r.talleres || []).map(t => (parseFloat(t['Tarifa Mensual']) || 0) * ((parseFloat(t['% Espacio']) || 50) / 100)).filter(x => x > 0);
+  const ticketAlumno = tarifas.length ? tarifas.reduce((a,b) => a+b, 0) / tarifas.length : 0;
+  const alumnosFalta = ticketAlumno > 0 ? Math.ceil(falta / ticketAlumno) : 0;
+  const pct = Math.min(100, cobertura);
+
+  el.innerHTML = `
+    <div class="section-title">PUNTO DE EQUILIBRIO</div>
+    ${state.costosFijosError ? `<div class="card" style="border-color:var(--rojo);margin-bottom:1rem;font-size:.85rem">No se pudo leer la solapa <strong>Costos_Fijos</strong>: ${state.costosFijosError}</div>` : ''}
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Costos fijos ${r.mes ? 'del mes' : '(' + meses + ' meses)'}</div><div class="stat-value">$${formatNum(fijoPeriodo)}</div></div>
+      <div class="stat-card"><div class="stat-label">Ingresos del espacio</div><div class="stat-value verde">$${formatNum(ingreso)}</div></div>
+      <div class="stat-card" style="border-color:${color}"><div class="stat-label">Cobertura</div><div class="stat-value" style="color:${color}">${Math.round(cobertura)}%</div><div style="font-size:.72rem;color:${color};margin-top:4px;letter-spacing:1px">● ${estado}</div></div>
+      <div class="stat-card"><div class="stat-label">Falta para cubrir</div><div class="stat-value" style="color:${falta > 0 ? 'var(--rojo)' : 'var(--verde)'}">$${formatNum(falta)}</div></div>
+    </div>
+    <div style="height:10px;background:var(--gris-card);border-radius:6px;overflow:hidden;margin:-.5rem 0 1.25rem"><div style="height:100%;width:${pct}%;background:${color}"></div></div>
+
+    ${falta > 0 ? `
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:.8rem;color:var(--gris-texto);margin-bottom:.6rem">¿Cuánto falta, en cosas concretas?</div>
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap">
+        <div><span class="tag-precio">${entradasFalta}</span> entradas a $${formatNum(p.precio)} (sala se queda ${p.pctSala}%)</div>
+        <div><span class="tag-precio">${funcFalta}</span> funciones llenas de 40</div>
+        <div><span class="tag-precio">${alumnosFalta}</span> alumnos más (aporte prom. $${formatNum(Math.round(ticketAlumno))})</div>
+      </div>
+    </div>` : ''}
+
+    <div class="card" style="margin-bottom:1rem">
+      <div style="font-size:.8rem;color:var(--gris-texto);margin-bottom:.6rem">Supuestos de cálculo (se guardan en este navegador)</div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:end">
+        <label style="font-size:.75rem">Precio entrada<input id="pe-precio" type="number" value="${p.precio}" onchange="peGuardarParams()" style="width:120px;display:block"></label>
+        <label style="font-size:.75rem">% para la sala<input id="pe-pct" type="number" value="${p.pctSala}" onchange="peGuardarParams()" style="width:90px;display:block"></label>
+        <label style="font-size:.75rem">Funciones por mes<input id="pe-func" type="number" value="${p.funcionesMes}" onchange="peGuardarParams()" style="width:90px;display:block"></label>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <div style="font-weight:600">Costos fijos mensuales</div>
+      <button class="btn btn-primary btn-sm" onclick="peAgregar()">+ Agregar costo</button>
+    </div>
+    <div class="table-wrap" style="margin-bottom:2rem">
+      <table>
+        <thead><tr><th>Concepto</th><th>Categoría</th><th>Monto / mes</th><th></th></tr></thead>
+        <tbody>
+          ${costos.length === 0 ? `<tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin costos fijos cargados (alquiler, servicios, sueldos, ABL, etc.)</td></tr>` :
+            costos.map(c => `<tr>
+              <td><strong>${c.Concepto || ''}</strong></td>
+              <td style="color:var(--gris-texto)">${c['Categoría'] || ''}</td>
+              <td>$${formatNum(parseFloat(c.Monto) || 0)}</td>
+              <td style="text-align:right;white-space:nowrap">
+                <button class="btn btn-ghost btn-sm" onclick="peEditar(${c.ID})">✏️</button>
+                <button class="btn btn-danger btn-sm" onclick="peBorrar(${c.ID})">🗑</button>
+              </td></tr>`).join('')}
+          <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>$${formatNum(totalFijo)}</strong></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>`;
+}
+
+async function peGuardarCosto(id, concepto, categoria, monto) {
+  const row = { Concepto: concepto, 'Categoría': categoria, Monto: monto };
+  const res = id ? await api('updateCostoFijo', { id, row }) : await api('addCostoFijo', { row });
+  if (res && res.error) { toast('Error: ' + res.error, 'error'); return; }
+  await loadCostosFijos();
+  toast('Costo guardado', 'success');
+}
+function peAgregar() {
+  const concepto = (window.prompt('Concepto (ej: Alquiler)') || '').trim();
+  if (!concepto) return;
+  const monto = parseFloat(window.prompt('Monto mensual en $'));
+  if (isNaN(monto)) return;
+  const categoria = (window.prompt('Categoría (ej: Alquiler, Servicios, Sueldos, Impuestos)') || '').trim();
+  peGuardarCosto(null, concepto, categoria, monto);
+}
+function peEditar(id) {
+  const c = (state.costosFijos || []).find(x => String(x.ID) === String(id));
+  if (!c) return;
+  const concepto = (window.prompt('Concepto', c.Concepto) || '').trim();
+  if (!concepto) return;
+  const monto = parseFloat(window.prompt('Monto mensual en $', c.Monto));
+  if (isNaN(monto)) return;
+  const categoria = (window.prompt('Categoría', c['Categoría'] || '') || '').trim();
+  peGuardarCosto(id, concepto, categoria, monto);
+}
+async function peBorrar(id) {
+  if (!confirm('¿Borrar este costo fijo?')) return;
+  const res = await api('deleteCostoFijo', { id });
+  if (res && res.error) { toast('Error: ' + res.error, 'error'); return; }
+  await loadCostosFijos();
+}
+
+function renderResultados_PLACEHOLDER(){}
+
 function abrirResultados() {
   if (pinValido) {
     mostrarPaginaResultados();
@@ -4191,7 +4342,7 @@ function cerrarResultados() {
   switchModule('talleres');
 }
 
-function renderResultados() {
+function renderResultadosBase() {
   const mes = parseInt(document.getElementById('res-mes').value) || null;
   const anio = parseInt(document.getElementById('res-anio').value) || null;
   const container = document.getElementById('resultados-contenido');
@@ -4257,29 +4408,31 @@ function renderResultados() {
   const resultadoFinal = resTalleres + resEventos + ingresosExternos - totalEgresos;
   const meses = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
+  window._res = {resTalleres, resEventos, ingresosExternos, totalEgresos, mes, anio, talleres};
   container.innerHTML = `
+    <div id="pe-contenido"></div>
     <div class="section-title">RESUMEN ${mes ? meses[mes].toUpperCase() : 'ACUMULADO'} ${anio || ''}</div>
     <div class="stats-row">
-      <div class="stat-card" style="border-color:rgba(245,168,0,0.3)">
+      <div class="stat-card" style="border-color:rgba(232,88,43,0.3)">
         <div class="stat-label">Ingresos talleres</div>
         <div class="stat-value amarillo">$${formatNum(resTalleres)}</div>
         <div style="font-size:0.72rem;color:var(--gris-texto);margin-top:4px">Ing. $${formatNum(ingTalleres)} − Hon. $${formatNum(honTalleres)}</div>
       </div>
-      <div class="stat-card" style="border-color:rgba(91,45,142,0.3)">
+      <div class="stat-card" style="border-color:rgba(169,184,216,0.3)">
         <div class="stat-label">Ingresos eventos</div>
-        <div class="stat-value" style="color:#c084fc">$${formatNum(resEventos)}</div>
+        <div class="stat-value" style="color:#A9B8D8">$${formatNum(resEventos)}</div>
         <div style="font-size:0.72rem;color:var(--gris-texto);margin-top:4px">${eventosP.length} evento/s</div>
       </div>
-      <div class="stat-card" style="border-color:rgba(76,175,80,0.3)">
+      <div class="stat-card" style="border-color:rgba(91,194,122,0.3)">
         <div class="stat-label">Ingresos externos</div>
         <div class="stat-value verde">$${formatNum(ingresosExternos)}</div>
         <div style="font-size:0.72rem;color:var(--gris-texto);margin-top:4px">Aportes, préstamos, etc.</div>
       </div>
-      <div class="stat-card" style="border-color:rgba(232,64,64,0.3)">
+      <div class="stat-card" style="border-color:rgba(255,107,94,0.3)">
         <div class="stat-label">Total egresos</div>
         <div class="stat-value" style="color:var(--rojo)">$${formatNum(totalEgresos)}</div>
       </div>
-      <div class="stat-card" style="border-color:${resultadoFinal >= 0 ? 'rgba(76,175,80,0.4)' : 'rgba(232,64,64,0.4)'}">
+      <div class="stat-card" style="border-color:${resultadoFinal >= 0 ? 'rgba(91,194,122,0.4)' : 'rgba(255,107,94,0.4)'}">
         <div class="stat-label">RESULTADO FINAL</div>
         <div class="stat-value" style="color:${resultadoFinal >= 0 ? 'var(--verde)' : 'var(--rojo)'}">$${formatNum(resultadoFinal)}</div>
       </div>
