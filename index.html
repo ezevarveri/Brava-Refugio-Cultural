@@ -696,6 +696,7 @@
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="switchModule('talleres')">Talleres</div>
     <div class="nav-tab" onclick="switchModule('eventos')">Eventos</div>
+    <div class="nav-tab" onclick="switchModule('bordereaux')">🧾 Bordereaux</div>
     <div class="nav-tab" onclick="switchModule('egresos')">💰 Caja</div>
     <div class="nav-tab" onclick="switchModule('stock')">📦 Stock</div>
     <div class="nav-tab" onclick="switchModule('resultados')">📊 Resultados</div>
@@ -943,6 +944,26 @@
           <tbody id="list-stock"></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- ═══════════ BORDEREAUX ═══════════ -->
+    <div class="page" id="page-bordereaux">
+      <div class="page-header">
+        <div>
+          <div class="page-title">BORDE<span>REAUX</span></div>
+          <div class="page-subtitle">Cuentas claras de cada función: Argentores, Brava y elenco</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModalBdx()">+ Función</button>
+      </div>
+      <div class="search-bar">
+        <select id="bdx-filtro-mes" onchange="renderBordereaux()" style="max-width:160px"></select>
+        <select id="bdx-filtro-estado" onchange="renderBordereaux()" style="max-width:180px">
+          <option value="">Todas</option>
+          <option value="Pendiente">Pendientes</option>
+          <option value="Liquidada">Liquidadas</option>
+        </select>
+      </div>
+      <div id="bdx-contenido"></div>
     </div>
 
     <!-- ═══════════ EGRESOS ═══════════ -->
@@ -1612,6 +1633,49 @@
   </div>
 </div>
 
+<!-- Modal Bordereaux -->
+<div class="modal-overlay" id="modal-bdx">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-bdx')">✕</button>
+    <div class="modal-title" id="modal-bdx-title">NUEVA FUNCIÓN</div>
+    <input type="hidden" id="bdx-id">
+    <div class="form-row">
+      <div class="form-group"><label>Fecha</label><input type="date" id="bdx-fecha"></div>
+      <div class="form-group"><label>Obra</label><input type="text" id="bdx-obra" placeholder="Nombre de la obra"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Opción</label>
+        <select id="bdx-opcion" onchange="bdxPreview()"><option value="A">A · Brava vende</option><option value="B">B · El elenco vende</option></select></div>
+      <div class="form-group"><label>Argentores (10%)</label>
+        <select id="bdx-arg" onchange="bdxPreview()"><option value="Sí">Sí, obra de autor registrado</option><option value="No">No</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Entradas generales</label><input type="number" id="bdx-ent" oninput="bdxPreview()" placeholder="0"></div>
+      <div class="form-group"><label>Precio general ($)</label><input type="number" id="bdx-precio" oninput="bdxPreview()" value="15000"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Entradas solidarias</label><input type="number" id="bdx-sol" oninput="bdxPreview()" placeholder="0"></div>
+      <div class="form-group"><label>Precio solidaria ($)</label><input type="number" id="bdx-psol" oninput="bdxPreview()" value="20000"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Primera función</label>
+        <select id="bdx-primera" onchange="bdxPreview()"><option value="No">No</option><option value="Sí">Sí (se suma puesta de luces)</option></select></div>
+      <div class="form-group"><label>Técnico</label>
+        <select id="bdx-tecnico" onchange="bdxPreview()"><option value="Brava">Lo pone Brava (Anto)</option><option value="Propio">Trae su técnico (sin puesta de luces)</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Ensayos a cobrar ($) <span style="color:var(--gris-texto);font-size:.7rem">lo acordado</span></label><input type="number" id="bdx-ensayo" oninput="bdxPreview()" placeholder="0"></div>
+      <div class="form-group"><label>Brava absorbe ($) <span style="color:var(--gris-texto);font-size:.7rem">opcional</span></label><input type="number" id="bdx-ajuste" oninput="bdxPreview()" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label>Notas <span style="color:var(--gris-texto);font-size:.7rem">(opcional)</span></label><input type="text" id="bdx-notas"></div>
+    <div id="bdx-preview" class="card" style="margin-top:.5rem"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-bdx')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveBdx()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal Egreso -->
 <div class="modal-overlay" id="modal-egreso">
   <div class="modal">
@@ -1664,6 +1728,10 @@
     <span class="icon">🎪</span>
     <span>Eventos</span>
   </div>
+  <div class="mobile-nav-item" id="mnav-bordereaux" onclick="mobileNav('bordereaux')">
+    <span class="icon">🧾</span>
+    <span>Bordereaux</span>
+  </div>
   <div class="mobile-nav-item" id="mnav-egresos" onclick="mobileNav('egresos')">
     <span class="icon">💸</span>
     <span>Egresos</span>
@@ -1700,6 +1768,7 @@ async function init() {
   setDefaultMes();
   state.eventos = [];
   state.egresos = [];
+  state.bordereaux = [];
   state.stock = [];
   await Promise.all([
     loadProfesores(),
@@ -1708,6 +1777,7 @@ async function init() {
     loadMovimientos(),
     loadEventos(),
     loadEgresos(),
+    loadBordereaux(),
     loadStock(),
     loadConfig()
   ]);
@@ -1799,6 +1869,8 @@ function mobileNav(mod) {
     document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
   } else if (mod === 'eventos') {
     switchModule_internal('eventos');
+  } else if (mod === 'bordereaux') {
+    switchModule_internal('bordereaux');
   } else if (mod === 'egresos') {
     switchModule_internal('egresos');
   } else if (mod === 'stock') {
@@ -1835,6 +1907,11 @@ function switchModule(mod) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-profesores').classList.add('active');
     document.querySelector('[onclick="showPage(\'profesores\', this)"]').classList.add('active');
+  } else if (mod === 'bordereaux') {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-bordereaux').classList.add('active');
+    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+    renderBordereaux();
   } else if (mod === 'egresos') {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-egresos').classList.add('active');
@@ -4161,6 +4238,183 @@ async function loadConfig() {
   }
 }
 
+
+// ── BORDEREAUX ───────────────────────────────────────────────
+const BDX = { argentores: 0.10, pctSala: 0.30, equipamiento: 50000, puestaLuces: 15000, seguro: 150000 };
+
+async function loadBordereaux() {
+  const data = await api('getBordereaux');
+  state.bordereauxError = (data && data.error) ? data.error : null;
+  state.bordereaux = Array.isArray(data) ? data : [];
+  renderBordereaux();
+}
+
+function bdxCalc(r) {
+  const n = v => parseFloat(v) || 0;
+  const rec = n(r.Entradas) * n(r.Precio) + n(r['Entradas solidarias']) * n(r['Precio solidaria']);
+  const arg = r.Argentores === 'No' ? 0 : rec * BDX.argentores;
+  const neto = rec - arg;
+  const puesta = (r['Primera función'] === 'Sí' && r['Técnico'] !== 'Propio') ? BDX.puestaLuces : 0;
+  const porcentaje = neto * BDX.pctSala + BDX.equipamiento + puesta;
+  const seguroAplica = BDX.seguro > porcentaje;
+  let brava = Math.max(porcentaje, BDX.seguro) - n(r['Brava absorbe']);
+  brava = Math.max(0, brava);
+  const ensayo = n(r['Ensayo cobrado']);
+  const elenco = neto - brava - ensayo;
+  return { rec, arg, neto, brava, ensayo, bravaTotal: brava + ensayo, elenco, seguroAplica, puesta,
+           chequeo: Math.round(arg + brava + ensayo + elenco) === Math.round(rec) };
+}
+
+function bdxMeses() {
+  const set = new Set();
+  (state.bordereaux || []).forEach(r => { const f = String(r.Fecha || '').slice(0,7); if (f) set.add(f); });
+  set.add(new Date().toISOString().slice(0,7));
+  return [...set].sort().reverse();
+}
+
+function renderBordereaux() {
+  const el = document.getElementById('bdx-contenido');
+  if (!el) return;
+  const selMes = document.getElementById('bdx-filtro-mes');
+  const prev = selMes.value;
+  const meses = bdxMeses();
+  selMes.innerHTML = '<option value="">Todos los meses</option>' + meses.map(m => `<option value="${m}">${m}</option>`).join('');
+  selMes.value = prev && (prev === '' || meses.includes(prev)) ? prev : meses[0];
+  const mes = selMes.value, estado = document.getElementById('bdx-filtro-estado').value;
+  let rows = (state.bordereaux || []).filter(r => (!mes || String(r.Fecha || '').slice(0,7) === mes) && (!estado || (r.Estado || 'Pendiente') === estado));
+  rows.sort((a,b) => String(b.Fecha).localeCompare(String(a.Fecha)));
+  const calc = rows.map(r => ({ r, c: bdxCalc(r) }));
+  const sum = f => calc.reduce((s,x) => s + f(x), 0);
+  const pend = calc.filter(x => (x.r.Estado || 'Pendiente') !== 'Liquidada');
+  const aPagarElencos = pend.filter(x => x.r['Opción'] !== 'B').reduce((s,x) => s + Math.max(0, x.c.elenco), 0);
+  const aPagarArg = sum(x => (x.r.Estado === 'Liquidada' ? 0 : x.c.arg * (x.r['Opción'] !== 'B' ? 1 : 0)));
+  const aCobrarElencos = pend.filter(x => x.r['Opción'] === 'B').reduce((s,x) => s + x.c.bravaTotal, 0);
+  const efectivoAPagar = aPagarElencos + aPagarArg;
+
+  el.innerHTML = `
+    ${state.bordereauxError ? `<div class="card" style="border-color:var(--rojo);margin-bottom:1rem;font-size:.85rem">No se pudo leer la solapa <strong>Bordereaux</strong>: ${state.bordereauxError}. Actualizá el Apps Script (ver instrucciones).</div>` : ''}
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Funciones</div><div class="stat-value">${rows.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Recaudado</div><div class="stat-value">$${formatNum(sum(x => x.c.rec))}</div></div>
+      <div class="stat-card"><div class="stat-label">Se queda en Brava</div><div class="stat-value verde">$${formatNum(sum(x => x.c.bravaTotal))}</div></div>
+      <div class="stat-card"><div class="stat-label">Va al elenco</div><div class="stat-value">$${formatNum(sum(x => x.c.elenco))}</div></div>
+    </div>
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.9rem">
+        <div>💵 Plata de elencos y Argentores que Brava tiene que pagar (Opción A pendiente): <strong>$${formatNum(efectivoAPagar)}</strong><span style="color:var(--gris-texto)"> · elencos $${formatNum(aPagarElencos)} + Argentores $${formatNum(aPagarArg)}</span></div>
+        <div>📥 A cobrar a elencos que vendieron (Opción B pendiente): <strong>$${formatNum(aCobrarElencos)}</strong></div>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Obra</th><th>Op.</th><th>Recaudación</th><th>Argentores</th><th>Brava</th><th>Elenco</th><th>Estado</th><th></th></tr></thead>
+      <tbody>${calc.length ? calc.map(({r,c}) => {
+        const liq = r.Estado === 'Liquidada';
+        const quien = r['Opción'] === 'B'
+          ? `El elenco transfiere $${formatNum(c.bravaTotal)} a Brava`
+          : `Brava paga $${formatNum(Math.max(0,c.elenco))} al elenco y $${formatNum(c.arg)} a Argentores`;
+        return `<tr>
+          <td>${formatFecha(String(r.Fecha||'').slice(0,10))}</td>
+          <td><strong>${r.Obra || ''}</strong>${c.seguroAplica ? ' <span class="tag-precio">seguro de sala</span>' : ''}${c.chequeo ? '' : ' <span style="color:var(--rojo)">⚠ no cierra</span>'}
+            <div style="font-size:.72rem;color:var(--gris-texto)">${(r.Entradas||0)}${parseFloat(r['Entradas solidarias'])>0?' + '+r['Entradas solidarias']+' solid.':''} entradas${r['Técnico']==='Propio'?' · técnico propio':''}${r['Primera función']==='Sí'?' · 1ª función':''}</div>
+            <div style="font-size:.72rem;color:var(--gris-texto)">${liq ? 'Liquidada' + (r['Fecha pago'] ? ' el ' + formatFecha(String(r['Fecha pago']).slice(0,10)) : '') : quien}</div></td>
+          <td>${r['Opción'] || 'A'}</td>
+          <td>$${formatNum(c.rec)}</td>
+          <td>$${formatNum(c.arg)}</td>
+          <td style="color:var(--verde)">$${formatNum(c.bravaTotal)}${c.ensayo ? `<div style="font-size:.7rem;color:var(--gris-texto)">incl. ensayos $${formatNum(c.ensayo)}</div>` : ''}</td>
+          <td style="${c.elenco < 0 ? 'color:var(--rojo)' : ''}">$${formatNum(c.elenco)}${c.elenco < 0 ? '<div style="font-size:.7rem">el elenco debe a Brava</div>' : ''}</td>
+          <td>${liq ? '✅' : '⏳'}</td>
+          <td style="white-space:nowrap">
+            ${liq ? '' : `<button class="btn btn-primary btn-sm" onclick="liquidarBdx(${r.ID})">${r['Opción']==='B'?'Cobrado':'Pagado'}</button>`}
+            <button class="btn btn-ghost btn-sm" onclick="editBdx(${r.ID})">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteBdx(${r.ID})">🗑</button>
+          </td></tr>`; }).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--gris-texto);padding:2rem">Todavía no hay funciones cargadas</td></tr>'}
+      </tbody></table></div>
+    <div style="font-size:.75rem;color:var(--gris-texto);margin-top:.75rem">Chequeo: Argentores + Brava + Elenco = Recaudación en cada función. "Pagado" (A) significa que Brava ya le pagó al elenco y a Argentores; "Cobrado" (B) que el elenco ya transfirió a Brava.</div>`;
+}
+
+function bdxFormRow() {
+  const g = id => document.getElementById(id).value;
+  return {
+    Fecha: g('bdx-fecha'), Obra: g('bdx-obra').trim(), 'Opción': g('bdx-opcion'),
+    Entradas: g('bdx-ent'), Precio: g('bdx-precio'),
+    'Entradas solidarias': g('bdx-sol'), 'Precio solidaria': g('bdx-psol'),
+    Argentores: g('bdx-arg'), 'Primera función': g('bdx-primera'), 'Técnico': g('bdx-tecnico'),
+    'Ensayo cobrado': g('bdx-ensayo'), 'Brava absorbe': g('bdx-ajuste'), Notas: g('bdx-notas')
+  };
+}
+
+function bdxPreview() {
+  const c = bdxCalc(bdxFormRow());
+  document.getElementById('bdx-preview').innerHTML = `
+    <div style="font-size:.85rem;line-height:1.7">
+      Recaudación <strong>$${formatNum(c.rec)}</strong><br>
+      Argentores <strong>$${formatNum(c.arg)}</strong><br>
+      Brava se queda <strong style="color:var(--verde)">$${formatNum(c.bravaTotal)}</strong>${c.seguroAplica ? ' <span class="tag-precio">seguro de sala</span>' : ''}<br>
+      Elenco recibe <strong style="${c.elenco < 0 ? 'color:var(--rojo)' : ''}">$${formatNum(c.elenco)}</strong>
+    </div>`;
+}
+
+function openModalBdx() {
+  ['bdx-id','bdx-obra','bdx-ent','bdx-sol','bdx-ensayo','bdx-ajuste','bdx-notas'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('bdx-fecha').value = new Date().toISOString().split('T')[0];
+  document.getElementById('bdx-precio').value = 15000;
+  document.getElementById('bdx-psol').value = 20000;
+  ['bdx-opcion'].forEach(i => document.getElementById(i).value = 'A');
+  document.getElementById('bdx-arg').value = 'Sí';
+  document.getElementById('bdx-primera').value = 'No';
+  document.getElementById('bdx-tecnico').value = 'Brava';
+  document.getElementById('modal-bdx-title').textContent = 'NUEVA FUNCIÓN';
+  bdxPreview();
+  openModal('modal-bdx');
+}
+
+function editBdx(id) {
+  const r = state.bordereaux.find(x => String(x.ID) === String(id));
+  if (!r) return;
+  const set = (i, v) => document.getElementById(i).value = v ?? '';
+  set('bdx-id', r.ID); set('bdx-fecha', String(r.Fecha || '').slice(0,10)); set('bdx-obra', r.Obra);
+  set('bdx-opcion', r['Opción'] || 'A'); set('bdx-ent', r.Entradas); set('bdx-precio', r.Precio);
+  set('bdx-sol', r['Entradas solidarias']); set('bdx-psol', r['Precio solidaria'] || 20000);
+  set('bdx-arg', r.Argentores || 'Sí'); set('bdx-primera', r['Primera función'] || 'No'); set('bdx-tecnico', r['Técnico'] || 'Brava');
+  set('bdx-ensayo', r['Ensayo cobrado']); set('bdx-ajuste', r['Brava absorbe']); set('bdx-notas', r.Notas);
+  document.getElementById('modal-bdx-title').textContent = 'EDITAR FUNCIÓN';
+  bdxPreview();
+  openModal('modal-bdx');
+}
+
+async function saveBdx() {
+  const id = document.getElementById('bdx-id').value;
+  const row = bdxFormRow();
+  if (!row.Obra || !row.Fecha) { toast('Fecha y obra son obligatorias', 'error'); return; }
+  if (!id) row.Estado = 'Pendiente';
+  const res = await api(id ? 'updateBordereaux' : 'addBordereaux', id ? { id, row } : { row });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast(id ? 'Función actualizada' : 'Función registrada');
+  closeModal('modal-bdx');
+  await loadBordereaux();
+}
+
+async function liquidarBdx(id) {
+  const r = state.bordereaux.find(x => String(x.ID) === String(id));
+  if (!r) return;
+  const c = bdxCalc(r);
+  const msg = r['Opción'] === 'B'
+    ? `¿Confirmás que el elenco ya transfirió $${formatNum(c.bravaTotal)} a Brava?`
+    : `¿Confirmás que ya pagaste $${formatNum(Math.max(0,c.elenco))} al elenco y $${formatNum(c.arg)} a Argentores?`;
+  if (!confirm(msg)) return;
+  const res = await api('updateBordereaux', { id, row: { Estado: 'Liquidada', 'Fecha pago': new Date().toISOString().split('T')[0] } });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Función liquidada');
+  await loadBordereaux();
+}
+
+async function deleteBdx(id) {
+  if (!confirm('¿Eliminar esta función?')) return;
+  const res = await api('deleteBordereaux', { id });
+  if (res.error) { toast(res.error, 'error'); return; }
+  toast('Función eliminada');
+  await loadBordereaux();
+}
 
 // ── PUNTO DE EQUILIBRIO ──────────────────────────────────────
 function renderResultados() {
