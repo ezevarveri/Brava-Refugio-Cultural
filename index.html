@@ -679,6 +679,17 @@
     .logo-text { font-size: 8px; }
     header h1 { display: none; }
   }
+
+  .app.no-side { grid-template-columns: 1fr; }
+  .app.no-side aside { display: none; }
+  tbody tr[onclick]:hover { background: var(--gris-card); }
+  @media print {
+    body.print-bdx header, body.print-bdx aside, body.print-bdx .mobile-nav, body.print-bdx #guardando, body.print-bdx #toasts,
+    body.print-bdx .page-header, body.print-bdx .nav-tabs, body.print-bdx button { display: none !important; }
+    body.print-bdx, body.print-bdx .card, body.print-bdx table, body.print-bdx td { background: #fff !important; color: #000 !important; }
+    body.print-bdx * { color: #000 !important; border-color: #999 !important; }
+    body.print-bdx body::before { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -694,32 +705,29 @@
     <div style="font-size:0.65rem;letter-spacing:3px;color:var(--gris-texto);text-transform:uppercase;margin-top:-4px">Tu refugio creativo</div>
   </div>
   <div class="nav-tabs">
-    <div class="nav-tab active" onclick="switchModule('talleres')">Talleres</div>
-    <div class="nav-tab" onclick="switchModule('eventos')">Eventos</div>
-    <div class="nav-tab" onclick="switchModule('bordereaux')">🧾 Bordereaux</div>
-    <div class="nav-tab" onclick="switchModule('egresos')">💰 Caja</div>
-    <div class="nav-tab" onclick="switchModule('stock')">📦 Stock</div>
-    <div class="nav-tab" onclick="switchModule('resultados')">📊 Resultados</div>
+    <div class="nav-tab active" data-mod="talleres" onclick="setModule('talleres')">Talleres</div>
+    <div class="nav-tab" data-mod="teatro" onclick="setModule('teatro')">Teatro</div>
+    <div class="nav-tab" data-mod="alquileres" onclick="setModule('alquileres')">Alquileres</div>
+    <div class="nav-tab" data-mod="gestion" onclick="setModule('gestion')">Gestión</div>
+    <div class="nav-tab" data-mod="resultados" onclick="setModule('resultados')">📊 Resultados</div>
   </div>
 </header>
 
 <div class="app">
   <!-- SIDEBAR -->
+
+
   <aside>
-    <div class="sidebar-label">Talleres</div>
-    <div class="sidebar-item active" onclick="showPage('profesores', this)">
-      <span class="icon">👤</span> Profesores
-      <span class="badge" id="badge-prof">0</span>
-    </div>
-    <div class="sidebar-item" onclick="showPage('talleres', this)">
+    <div class="sidebar-item active" onclick="showPage('talleres', this)">
       <span class="icon">🎭</span> Talleres
       <span class="badge" id="badge-talleres">0</span>
     </div>
-    <div class="sidebar-item" onclick="showPage('cuentas', this)">
-      <span class="icon">💰</span> Cuentas Corrientes
+    <div class="sidebar-item" onclick="showPage('profesores', this)">
+      <span class="icon">👤</span> Profesores
+      <span class="badge" id="badge-prof">0</span>
     </div>
     <div class="sidebar-item" onclick="showPage('liquidacion', this)">
-      <span class="icon">📊</span> Liquidación Mensual
+      <span class="icon">📊</span> Liquidación mensual
     </div>
   </aside>
 
@@ -727,7 +735,7 @@
   <main>
 
     <!-- ═══════════ PROFESORES ═══════════ -->
-    <div class="page active" id="page-profesores">
+    <div class="page" id="page-profesores">
       <div class="page-header">
         <div>
           <div class="page-title">PROFE<span>SORES</span></div>
@@ -741,7 +749,7 @@
     </div>
 
     <!-- ═══════════ TALLERES ═══════════ -->
-    <div class="page" id="page-talleres">
+    <div class="page active" id="page-talleres">
       <div class="page-header">
         <div>
           <div class="page-title">TALLE<span>RES</span></div>
@@ -802,97 +810,6 @@
       </div>
     </div>
 
-    <!-- ═══════════ ALUMNOS (página legacy, oculta) ═══════════ -->
-    <div class="page" id="page-alumnos">
-      <div class="page-header">
-        <div>
-          <div class="page-title">ALUM<span>NOS</span></div>
-          <div class="page-subtitle">Inscripciones y datos</div>
-        </div>
-        <button class="btn btn-primary" onclick="openModal('modal-alumno')">+ Nuevo alumno</button>
-      </div>
-      <div class="search-bar">
-        <input type="text" id="search-alumnos" placeholder="Buscar alumno..." oninput="renderAlumnos()">
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Alumno</th>
-              <th>Teléfono</th>
-              <th>Talleres</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="list-alumnos"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ═══════════ CUENTAS CORRIENTES ═══════════ -->
-    <div class="page" id="page-cuentas">
-      <div class="page-header">
-        <div>
-          <div class="page-title">CUENTAS <span>CORRIENTES</span></div>
-          <div class="page-subtitle">Pagos y movimientos por alumno</div>
-        </div>
-      </div>
-      <div class="search-bar">
-        <select id="filtro-alumno-cc" onchange="renderCuentaCorriente()" style="max-width:320px">
-          <option value="">Seleccionar alumno...</option>
-        </select>
-        <button class="btn btn-primary" onclick="openModalMovimiento()">+ Nuevo movimiento</button>
-      </div>
-      <div id="cc-contenido">
-        <div class="empty">
-          <div class="icon">💳</div>
-          <p>Seleccioná un alumno para ver su cuenta corriente</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═══════════ EVENTOS ═══════════ -->
-    <div class="page" id="page-eventos">
-      <div class="page-header">
-        <div>
-          <div class="page-title">EVEN<span>TOS</span></div>
-          <div class="page-subtitle">Obras, muestras, presentaciones y más</div>
-        </div>
-        <div style="display:flex;gap:0.75rem;align-items:center">
-          <select id="filtro-estado-evento" onchange="renderEventos()" style="max-width:160px">
-            <option value="activo">Activos</option>
-            <option value="cerrado">Historial</option>
-            <option value="">Todos</option>
-          </select>
-          <button class="btn btn-primary" onclick="openModalNuevoEvento()">+ Nuevo evento</button>
-        </div>
-      </div>
-      <div id="list-eventos">
-        <div class="loading"><div class="spinner"></div> Cargando...</div>
-      </div>
-    </div>
-
-    <!-- ═══════════ DETALLE EVENTO ═══════════ -->
-    <div class="page" id="page-evento-detalle">
-      <div class="page-header">
-        <div>
-          <button class="btn btn-ghost btn-sm" onclick="volverEventos()" style="margin-bottom:0.5rem">← Volver</button>
-          <div class="page-title" id="detalle-evento-titulo">EVENTO</div>
-          <div class="page-subtitle" id="detalle-evento-fecha"></div>
-        </div>
-        <div style="display:flex;gap:0.75rem" id="detalle-evento-acciones"></div>
-      </div>
-      <div style="display:flex;gap:0;background:var(--gris-card);border-radius:8px;padding:4px;border:1px solid var(--gris-borde);margin-bottom:1.5rem;width:fit-content">
-        <div class="nav-tab active" id="etab-reservas" onclick="switchETab('reservas')">Reservas</div>
-        <div class="nav-tab" id="etab-gastro" onclick="switchETab('gastro')">Gastronomía</div>
-        <div class="nav-tab" id="etab-resultado" onclick="switchETab('resultado')">Resultado</div>
-      </div>
-      <div id="etab-content-reservas" class="etab-content"></div>
-      <div id="etab-content-gastro" class="etab-content" style="display:none"></div>
-      <div id="etab-content-resultado" class="etab-content" style="display:none"></div>
-    </div>
-
     <!-- ═══════════ LIQUIDACIÓN ═══════════ -->
     <div class="page" id="page-liquidacion">
       <div class="page-header">
@@ -919,106 +836,6 @@
       <div id="liq-resultado"></div>
     </div>
 
-    <!-- ═══════════ STOCK ═══════════ -->
-    <div class="page" id="page-stock">
-      <div class="page-header">
-        <div>
-          <div class="page-title">STOCK <span>GASTRO</span></div>
-          <div class="page-subtitle">Mercadería disponible para eventos</div>
-        </div>
-        <button class="btn btn-primary" onclick="openModalStock()">+ Agregar al stock</button>
-      </div>
-      <div id="stock-stats" style="margin-bottom:1.5rem"></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Precio costo</th>
-              <th>Unidad</th>
-              <th style="text-align:center">Disponible</th>
-              <th>Valor total</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="list-stock"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ═══════════ BORDEREAUX ═══════════ -->
-    <div class="page" id="page-bordereaux">
-      <div class="page-header">
-        <div>
-          <div class="page-title">BORDE<span>REAUX</span></div>
-          <div class="page-subtitle">Cuentas claras de cada función: Argentores, Brava y elenco</div>
-        </div>
-        <button class="btn btn-primary" onclick="openModalBdx()">+ Función</button>
-      </div>
-      <div class="search-bar">
-        <select id="bdx-filtro-mes" onchange="renderBordereaux()" style="max-width:160px"></select>
-        <select id="bdx-filtro-estado" onchange="renderBordereaux()" style="max-width:180px">
-          <option value="">Todas</option>
-          <option value="Pendiente">Pendientes</option>
-          <option value="Liquidada">Liquidadas</option>
-        </select>
-      </div>
-      <div id="bdx-contenido"></div>
-    </div>
-
-    <!-- ═══════════ EGRESOS ═══════════ -->
-    <div class="page" id="page-egresos">
-      <div class="page-header">
-        <div>
-          <div class="page-title">CA<span>JA</span></div>
-          <div class="page-subtitle">Ingresos y egresos del espacio</div>
-        </div>
-        <div style="display:flex;gap:0.75rem">
-          <button class="btn btn-ghost btn-violeta" onclick="openModalIngreso()">+ Ingreso</button>
-          <button class="btn btn-primary" onclick="openModalEgreso()">+ Egreso</button>
-        </div>
-      </div>
-      <div class="search-bar">
-        <select id="filtro-egreso-mes" onchange="renderEgresos()" style="max-width:160px">
-          <option value="">Todos los meses</option>
-          <option value="1">Enero</option><option value="2">Febrero</option>
-          <option value="3">Marzo</option><option value="4">Abril</option>
-          <option value="5">Mayo</option><option value="6">Junio</option>
-          <option value="7">Julio</option><option value="8">Agosto</option>
-          <option value="9">Septiembre</option><option value="10">Octubre</option>
-          <option value="11">Noviembre</option><option value="12">Diciembre</option>
-        </select>
-        <select id="filtro-egreso-anio" onchange="renderEgresos()" style="max-width:120px">
-          <option value="">Todos</option>
-          <option value="2025">2025</option>
-          <option value="2026" selected>2026</option>
-        </select>
-        <select id="filtro-egreso-cat" onchange="renderEgresos()" style="max-width:180px">
-          <option value="">Todas las categorías</option>
-          <option value="Gasto fijo">Gasto fijo</option>
-          <option value="Gasto variable">Gasto variable</option>
-          <option value="Inversión">Inversión</option>
-          <option value="Otro">Otro</option>
-        </select>
-      </div>
-      <div id="egresos-stats" style="margin-bottom:1.5rem"></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Concepto</th>
-              <th>Categoría</th>
-              <th>Notas</th>
-              <th>Monto</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="list-egresos"></tbody>
-        </table>
-      </div>
-    </div>
-
     <!-- ═══════════ PIN ═══════════ -->
     <div class="page" id="page-pin">
       <div style="display:flex;align-items:center;justify-content:center;min-height:60vh">
@@ -1036,30 +853,50 @@
       </div>
     </div>
 
+
+    <!-- ═══════════ TEATRO ═══════════ -->
+    <div class="page" id="page-teatro">
+      <div class="page-header">
+        <div><div class="page-title">TEA<span>TRO</span></div><div class="page-subtitle">Funciones, entradas y bordereaux</div></div>
+        <button class="btn btn-primary" onclick="openModalFuncion()">+ Función</button>
+      </div>
+      <div class="search-bar">
+        <select id="teatro-mes" onchange="renderTeatro()" style="max-width:200px"></select>
+        <select id="teatro-estado" onchange="renderTeatro()" style="max-width:180px">
+          <option value="">Todas</option><option value="Pendiente">Pendientes</option><option value="Liquidada">Liquidadas</option></select>
+      </div>
+      <div id="teatro-contenido"></div>
+    </div>
+
+    <div class="page" id="page-funcion"><div id="funcion-contenido"></div></div>
+
+    <!-- ═══════════ ALQUILERES ═══════════ -->
+    <div class="page" id="page-alquileres">
+      <div class="page-header">
+        <div><div class="page-title">ALQUI<span>LERES</span></div><div class="page-subtitle">Muestras, funciones y eventos de terceros</div></div>
+        <button class="btn btn-primary" onclick="openModalAlquiler()">+ Alquiler</button>
+      </div>
+      <div class="search-bar"><select id="alq-mes" onchange="renderAlquileres()" style="max-width:200px"></select></div>
+      <div id="alquileres-contenido"></div>
+    </div>
+
+    <!-- ═══════════ GESTIÓN ═══════════ -->
+    <div class="page" id="page-gestion">
+      <div class="page-header">
+        <div><div class="page-title">GES<span>TIÓN</span></div><div class="page-subtitle">Ingresos automáticos y egresos del espacio</div></div>
+        <button class="btn btn-primary" onclick="openModalEgreso()">+ Egreso</button>
+      </div>
+      <div class="search-bar"><select id="ges-mes" onchange="renderGestion()" style="max-width:200px"></select></div>
+      <div id="gestion-contenido"></div>
+    </div>
+
     <!-- ═══════════ RESULTADOS ═══════════ -->
     <div class="page" id="page-resultados">
       <div class="page-header">
-        <div>
-          <div class="page-title">RESUL<span>TADOS</span></div>
-          <div class="page-subtitle">Dashboard financiero del espacio</div>
-        </div>
+        <div><div class="page-title">RESUL<span>TADOS</span></div><div class="page-subtitle">Ingreso vs egreso del espacio</div></div>
         <button class="btn btn-ghost btn-sm" onclick="cerrarResultados()">🔒 Cerrar</button>
       </div>
-      <div class="search-bar">
-        <select id="res-mes" onchange="renderResultados()" style="max-width:160px">
-          <option value="">Todo el período</option>
-          <option value="1">Enero</option><option value="2">Febrero</option>
-          <option value="3">Marzo</option><option value="4">Abril</option>
-          <option value="5">Mayo</option><option value="6">Junio</option>
-          <option value="7">Julio</option><option value="8">Agosto</option>
-          <option value="9">Septiembre</option><option value="10">Octubre</option>
-          <option value="11">Noviembre</option><option value="12">Diciembre</option>
-        </select>
-        <select id="res-anio" onchange="renderResultados()" style="max-width:120px">
-          <option value="2025">2025</option>
-          <option value="2026" selected>2026</option>
-        </select>
-      </div>
+      <div class="search-bar"><select id="res-anio" onchange="renderResultados()" style="max-width:120px"></select></div>
       <div id="resultados-contenido"></div>
     </div>
 
@@ -1270,409 +1107,56 @@
   </div>
 </div>
 
-<!-- Modal Movimiento -->
-<div class="modal-overlay" id="modal-movimiento">
+<!-- Modal Función -->
+<div class="modal-overlay" id="modal-funcion">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-movimiento')">✕</button>
-    <div class="modal-title">NUEVO MOVIMIENTO</div>
-    <div class="form-group">
-      <label>Alumno</label>
-      <select id="mov-alumno" onchange="cargarTalleresAlumno()"></select>
-    </div>
-    <div class="form-group">
-      <label>Taller</label>
-      <select id="mov-taller"></select>
+    <button class="modal-close" onclick="closeModal('modal-funcion')">✕</button>
+    <div class="modal-title" id="modal-func-title">NUEVA FUNCIÓN</div>
+    <input type="hidden" id="func-id">
+    <div class="form-row">
+      <div class="form-group"><label>Obra</label><input type="text" id="func-obra" list="func-obras" onchange="funcObraElegida()" placeholder="Nombre de la obra"><datalist id="func-obras"></datalist></div>
+      <div class="form-group"><label>Fecha</label><input type="date" id="func-fecha"></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" id="mov-fecha">
-      </div>
-      <div class="form-group">
-        <label>Tipo</label>
-        <select id="mov-tipo">
-          <option value="pago">Pago</option>
-          <option value="inscripcion">Inscripción</option>
-          <option value="beca">Beca / Descuento</option>
-          <option value="debito">Débito / Cargo extra</option>
-        </select>
-      </div>
+      <div class="form-group"><label>Modalidad</label><select id="func-modalidad"><option value="A">A · Brava vende</option><option value="B">B · El elenco vende</option></select></div>
+      <div class="form-group"><label>Argentores (10%)</label><select id="func-arg"><option value="Sí">Sí, autor registrado</option><option value="No">No</option></select></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Monto ($)</label>
-        <input type="number" id="mov-monto" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label>Concepto</label>
-        <input type="text" id="mov-concepto" placeholder="Ej: Cuota Mayo">
-      </div>
+      <div class="form-group"><label>Precio general ($)</label><input type="number" id="func-precio"></div>
+      <div class="form-group"><label>Precio solidaria ($)</label><input type="number" id="func-psol"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-movimiento')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveMovimiento()">Guardar</button>
+    <div class="form-row">
+      <div class="form-group"><label>Primera función</label><select id="func-primera"><option value="No">No</option><option value="Sí">Sí (se suma puesta de luces)</option></select></div>
+      <div class="form-group"><label>Técnico</label><select id="func-tecnico"><option value="Brava">Lo pone Brava (Anto)</option><option value="Propio">Trae su técnico (sin puesta de luces)</option></select></div>
     </div>
+    <div class="form-row">
+      <div class="form-group"><label>Ensayos a cobrar ($) <span style="color:var(--gris-texto);font-size:.7rem">lo acordado</span></label><input type="number" id="func-ensayo" placeholder="0"></div>
+      <div class="form-group"><label>Brava absorbe ($) <span style="color:var(--gris-texto);font-size:.7rem">opcional</span></label><input type="number" id="func-ajuste" placeholder="0"></div>
+    </div>
+    <div class="form-group"><label>Notas <span style="color:var(--gris-texto);font-size:.7rem">(opcional)</span></label><input type="text" id="func-notas"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-funcion')">Cancelar</button><button class="btn btn-primary" onclick="saveFuncion()">Guardar</button></div>
   </div>
 </div>
 
-<!-- Modal Evento -->
-<div class="modal-overlay" id="modal-evento">
-  <div class="modal" style="max-width:620px">
-    <button class="modal-close" onclick="closeModal('modal-evento')">✕</button>
-    <div class="modal-title" id="modal-evento-title">NUEVO EVENTO</div>
-    <input type="hidden" id="evento-id">
-    <div class="form-group">
-      <label>Nombre del evento</label>
-      <input type="text" id="evento-nombre" placeholder="Ej: Obra de teatro — La vida es sueño">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" id="evento-fecha">
-      </div>
-      <div class="form-group">
-        <label>Tipo de evento</label>
-        <select id="evento-tipo" onchange="toggleEventoTipo()">
-          <option value="">Seleccionar...</option>
-          <option value="teatro">Teatro</option>
-          <option value="danza">Danza</option>
-          <option value="musica">Música</option>
-          <option value="muestra">Muestra / Exposición</option>
-          <option value="circo">Circo</option>
-          <option value="otro">Otro</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Modelo de negocio</label>
-      <select id="evento-modelo" onchange="toggleEventoModelo()">
-        <option value="porcentaje">Porcentaje — se divide la recaudación</option>
-        <option value="alquiler">Alquiler fijo — el organizador paga un monto al espacio</option>
-        <option value="gratuito">Sin entrada / Gratuito</option>
-      </select>
-    </div>
-    <div id="evento-campos-porcentaje">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Precio de entrada ($)</label>
-          <input type="number" id="evento-precio" placeholder="0">
-        </div>
-        <div class="form-group">
-          <label>% para el espacio</label>
-          <input type="number" id="evento-pct-espacio" placeholder="Ej: 30" oninput="calcPctOrganizador()">
-        </div>
-      </div>
-      <div class="form-group">
-        <label>% para el organizador</label>
-        <input type="number" id="evento-pct-organizador" placeholder="Se calcula automáticamente" readonly style="opacity:0.6">
-      </div>
-    </div>
-    <div id="evento-campos-alquiler" style="display:none">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Monto de alquiler ($)</label>
-          <input type="number" id="evento-alquiler" placeholder="0">
-        </div>
-        <div class="form-group">
-          <label>Precio de entrada ($) <span style="color:var(--gris-texto);font-size:0.7rem">(opcional)</span></label>
-          <input type="number" id="evento-precio-alquiler" placeholder="0">
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Organizador / Compañía</label>
-      <input type="text" id="evento-organizador" placeholder="Nombre del organizador o compañía">
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-evento')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveEvento()">Guardar y abrir</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Reserva -->
-<div class="modal-overlay" id="modal-reserva">
+<!-- Modal Alquiler -->
+<div class="modal-overlay" id="modal-alquiler">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-reserva')">✕</button>
-    <div class="modal-title" id="modal-reserva-title">NUEVA RESERVA</div>
-    <input type="hidden" id="reserva-id">
+    <button class="modal-close" onclick="closeModal('modal-alquiler')">✕</button>
+    <div class="modal-title" id="modal-alq-title">NUEVO ALQUILER</div>
+    <input type="hidden" id="alq-id">
     <div class="form-row">
-      <div class="form-group">
-        <label>Nombre</label>
-        <input type="text" id="reserva-nombre" placeholder="Nombre del reservante">
-      </div>
-      <div class="form-group">
-        <label>Teléfono</label>
-        <input type="text" id="reserva-tel" placeholder="11 xxxx-xxxx">
-      </div>
+      <div class="form-group"><label>Nombre del evento</label><input type="text" id="alq-evento" placeholder="Muestra de teatro, función de canto..."></div>
+      <div class="form-group"><label>Responsable</label><input type="text" id="alq-resp"></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Cantidad de entradas</label>
-        <input type="number" id="reserva-cantidad" placeholder="1" min="1" value="1">
-      </div>
-      <div class="form-group">
-        <label>Estado de pago</label>
-        <select id="reserva-estado" onchange="toggleSeña()">
-          <option value="sin pagar">Sin pagar</option>
-          <option value="seña">Con seña</option>
-          <option value="paga">Paga completa</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group" id="campo-seña" style="display:none">
-      <label>Monto seña ($)</label>
-      <input type="number" id="reserva-seña" placeholder="0">
-    </div>
-    <div class="form-group">
-      <label>Medio de pago</label>
-      <select id="reserva-medio-pago">
-        <option value="Efectivo">Efectivo</option>
-        <option value="Transferencia">Transferencia</option>
-        <option value="QR">QR</option>
-      </select>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-reserva')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveReserva()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Entrada en Puerta (rápido) -->
-<div class="modal-overlay" id="modal-entrada-puerta">
-  <div class="modal" style="max-width:420px">
-    <button class="modal-close" onclick="closeModal('modal-entrada-puerta')">✕</button>
-    <div class="modal-title">🚪 ENTRADA EN PUERTA</div>
-    <div class="form-group">
-      <label>Nombre <span style="color:var(--gris-texto);font-size:0.7rem">(opcional)</span></label>
-      <input type="text" id="puerta-nombre" placeholder="Nombre del asistente">
+      <div class="form-group"><label>Monto ($)</label><input type="number" id="alq-monto"></div>
+      <div class="form-group"><label>Fecha del evento</label><input type="date" id="alq-fecha"></div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Cantidad de entradas</label>
-        <input type="number" id="puerta-cantidad" placeholder="1" min="1" value="1">
-      </div>
-      <div class="form-group">
-        <label>¿Pagó?</label>
-        <select id="puerta-pago">
-          <option value="paga">Sí, pagó</option>
-          <option value="sin pagar">No pagó</option>
-        </select>
-      </div>
+      <div class="form-group"><label>Fecha de pago <span style="color:var(--gris-texto);font-size:.7rem">vacía = pendiente</span></label><input type="date" id="alq-pago"></div>
+      <div class="form-group"><label>Notas</label><input type="text" id="alq-notas"></div>
     </div>
-    <div class="form-group">
-      <label>Medio de pago</label>
-      <select id="puerta-medio-pago">
-        <option value="Efectivo">Efectivo</option>
-        <option value="Transferencia">Transferencia</option>
-        <option value="QR">QR</option>
-      </select>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-entrada-puerta')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveEntradaPuerta()" style="font-size:1rem;padding:0.75rem 1.5rem">✅ Registrar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Gastro Compra -->
-<div class="modal-overlay" id="modal-gastro-compra">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-gastro-compra')">✕</button>
-    <div class="modal-title" id="modal-gastro-compra-title">PRODUCTO COMPRADO</div>
-    <input type="hidden" id="gastro-compra-id">
-    <div class="form-group">
-      <label>Producto</label>
-      <input type="text" id="gastro-compra-producto" placeholder="Ej: Vino tinto Malbec">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Precio costo ($)</label>
-        <input type="number" id="gastro-compra-precio" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label>Cantidad</label>
-        <input type="number" id="gastro-compra-cantidad" placeholder="0">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-gastro-compra')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveGastroCompra()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Gastro Venta -->
-<div class="modal-overlay" id="modal-gastro-venta">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-gastro-venta')">✕</button>
-    <div class="modal-title" id="modal-gastro-venta-title">VENTA REGISTRADA</div>
-    <input type="hidden" id="gastro-venta-id">
-    <div class="form-group">
-      <label>Producto</label>
-      <input type="text" id="gastro-venta-producto" placeholder="Ej: Vino tinto Malbec">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Precio de venta ($)</label>
-        <input type="number" id="gastro-venta-precio" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label>Cantidad vendida</label>
-        <input type="number" id="gastro-venta-cantidad" placeholder="0">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-gastro-venta')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveGastroVenta()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Stock -->
-<div class="modal-overlay" id="modal-stock">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-stock')">✕</button>
-    <div class="modal-title" id="modal-stock-title">AGREGAR AL STOCK</div>
-    <input type="hidden" id="stock-id">
-    <div class="form-group">
-      <label>Producto</label>
-      <input type="text" id="stock-producto" placeholder="Ej: Coca Cola">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Precio costo ($) por unidad de compra</label>
-        <input type="number" id="stock-precio" placeholder="0" oninput="calcCostoVenta()">
-      </div>
-      <div class="form-group">
-        <label>Unidad de compra</label>
-        <input type="text" id="stock-unidad" placeholder="Ej: botella 2.25L">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Rendimiento <span style="color:var(--gris-texto);font-size:0.7rem">(unidades de venta por compra)</span></label>
-        <input type="number" id="stock-rendimiento" placeholder="Ej: 9" min="1" value="1" oninput="calcCostoVenta()">
-      </div>
-      <div class="form-group">
-        <label>Unidad de venta</label>
-        <input type="text" id="stock-unidad-venta" placeholder="Ej: vaso">
-      </div>
-    </div>
-    <div id="stock-costo-venta" style="background:rgba(232,88,43,0.08);border:1px solid rgba(232,88,43,0.2);border-radius:8px;padding:0.75rem;font-size:0.85rem;color:var(--amarillo);margin-bottom:0.75rem;display:none">
-      💡 Costo por unidad de venta: <strong id="stock-costo-venta-valor">$0</strong>
-    </div>
-    <div class="form-group">
-      <label>Cantidad comprada <span style="color:var(--gris-texto);font-size:0.7rem">(se suma al stock existente)</span></label>
-      <input type="number" id="stock-cantidad" placeholder="0" min="0">
-    </div>
-    <div style="background:rgba(232,88,43,0.08);border:1px solid rgba(232,88,43,0.2);border-radius:8px;padding:0.75rem;font-size:0.8rem;color:var(--gris-texto);margin-top:0.5rem">
-      💡 Al guardar se registra automáticamente un egreso por el costo total de esta compra
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-stock')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveStock()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Usar Stock en Evento -->
-<div class="modal-overlay" id="modal-usar-stock">
-  <div class="modal" style="max-width:620px">
-    <button class="modal-close" onclick="closeModal('modal-usar-stock')">✕</button>
-    <div class="modal-title">USAR STOCK DEL EVENTO</div>
-    <div style="color:var(--gris-texto);font-size:0.85rem;margin-bottom:1rem">Seleccioná los productos que usaste en este evento. Se descontarán del stock disponible.</div>
-    <div id="usar-stock-lista"></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-usar-stock')">Cancelar</button>
-      <button class="btn btn-primary" onclick="confirmarUsoStock()">Confirmar uso</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Ingreso Caja -->
-<div class="modal-overlay" id="modal-ingreso">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-ingreso')">✕</button>
-    <div class="modal-title" style="color:var(--verde)">INGRESO DE CAJA</div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" id="ingreso-fecha">
-      </div>
-      <div class="form-group">
-        <label>Categoría</label>
-        <select id="ingreso-categoria">
-          <option value="Aporte">Aporte</option>
-          <option value="Inversión">Inversión</option>
-          <option value="Donación">Donación</option>
-          <option value="Préstamo">Préstamo</option>
-          <option value="Otro">Otro</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Concepto</label>
-      <input type="text" id="ingreso-concepto" placeholder="Ej: Aporte reparación techo">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Monto ($)</label>
-        <input type="number" id="ingreso-monto" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label>Notas <span style="color:var(--gris-texto);font-size:0.7rem">opcional</span></label>
-        <input type="text" id="ingreso-notas" placeholder="Observaciones">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-ingreso')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveIngreso()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Bordereaux -->
-<div class="modal-overlay" id="modal-bdx">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-bdx')">✕</button>
-    <div class="modal-title" id="modal-bdx-title">NUEVA FUNCIÓN</div>
-    <input type="hidden" id="bdx-id">
-    <div class="form-row">
-      <div class="form-group"><label>Fecha</label><input type="date" id="bdx-fecha"></div>
-      <div class="form-group"><label>Obra</label><input type="text" id="bdx-obra" placeholder="Nombre de la obra"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Opción</label>
-        <select id="bdx-opcion" onchange="bdxPreview()"><option value="A">A · Brava vende</option><option value="B">B · El elenco vende</option></select></div>
-      <div class="form-group"><label>Argentores (10%)</label>
-        <select id="bdx-arg" onchange="bdxPreview()"><option value="Sí">Sí, obra de autor registrado</option><option value="No">No</option></select></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Entradas generales</label><input type="number" id="bdx-ent" oninput="bdxPreview()" placeholder="0"></div>
-      <div class="form-group"><label>Precio general ($)</label><input type="number" id="bdx-precio" oninput="bdxPreview()" value="15000"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Entradas solidarias</label><input type="number" id="bdx-sol" oninput="bdxPreview()" placeholder="0"></div>
-      <div class="form-group"><label>Precio solidaria ($)</label><input type="number" id="bdx-psol" oninput="bdxPreview()" value="20000"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Primera función</label>
-        <select id="bdx-primera" onchange="bdxPreview()"><option value="No">No</option><option value="Sí">Sí (se suma puesta de luces)</option></select></div>
-      <div class="form-group"><label>Técnico</label>
-        <select id="bdx-tecnico" onchange="bdxPreview()"><option value="Brava">Lo pone Brava (Anto)</option><option value="Propio">Trae su técnico (sin puesta de luces)</option></select></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Ensayos a cobrar ($) <span style="color:var(--gris-texto);font-size:.7rem">lo acordado</span></label><input type="number" id="bdx-ensayo" oninput="bdxPreview()" placeholder="0"></div>
-      <div class="form-group"><label>Brava absorbe ($) <span style="color:var(--gris-texto);font-size:.7rem">opcional</span></label><input type="number" id="bdx-ajuste" oninput="bdxPreview()" placeholder="0"></div>
-    </div>
-    <div class="form-group"><label>Notas <span style="color:var(--gris-texto);font-size:.7rem">(opcional)</span></label><input type="text" id="bdx-notas"></div>
-    <div id="bdx-preview" class="card" style="margin-top:.5rem"></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-bdx')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveBdx()">Guardar</button>
-    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-alquiler')">Cancelar</button><button class="btn btn-primary" onclick="saveAlquiler()">Guardar</button></div>
   </div>
 </div>
 
@@ -1683,69 +1167,30 @@
     <div class="modal-title" id="modal-egreso-title">NUEVO EGRESO</div>
     <input type="hidden" id="egreso-id">
     <div class="form-row">
-      <div class="form-group">
-        <label>Fecha</label>
-        <input type="date" id="egreso-fecha">
-      </div>
-      <div class="form-group">
-        <label>Categoría</label>
-        <select id="egreso-categoria">
-          <option value="Gasto fijo">Gasto fijo</option>
-          <option value="Gasto variable">Gasto variable</option>
-          <option value="Inversión">Inversión</option>
-          <option value="Otro">Otro</option>
-        </select>
-      </div>
+      <div class="form-group"><label>Fecha</label><input type="date" id="egreso-fecha"></div>
+      <div class="form-group"><label>Categoría</label><select id="egreso-categoria"></select></div>
     </div>
-    <div class="form-group">
-      <label>Concepto</label>
-      <input type="text" id="egreso-concepto" placeholder="Ej: Alquiler marzo">
-    </div>
+    <div class="form-group"><label>Concepto</label><input type="text" id="egreso-concepto" placeholder="Ej: Alquiler noviembre"></div>
     <div class="form-row">
-      <div class="form-group">
-        <label>Monto ($)</label>
-        <input type="number" id="egreso-monto" placeholder="0">
-      </div>
-      <div class="form-group">
-        <label>Notas <span style="color:var(--gris-texto);font-size:0.7rem">(opcional)</span></label>
-        <input type="text" id="egreso-notas" placeholder="Observaciones">
-      </div>
+      <div class="form-group"><label>Monto ($)</label><input type="number" id="egreso-monto"></div>
+      <div class="form-group"><label>Modalidad de pago</label><select id="egreso-modalidad"><option>Efectivo</option><option>Transferencia</option><option>Débito</option><option>Tarjeta</option></select></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modal-egreso')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveEgreso()">Guardar</button>
-    </div>
+    <div class="form-group"><label>Notas <span style="color:var(--gris-texto);font-size:.7rem">(opcional)</span></label><input type="text" id="egreso-notas"></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-egreso')">Cancelar</button><button class="btn btn-primary" onclick="saveEgreso()">Guardar</button></div>
   </div>
 </div>
 
 <!-- Menú inferior mobile -->
 <nav class="mobile-nav" id="mobile-nav">
-  <div class="mobile-nav-item active" id="mnav-talleres" onclick="mobileNav('talleres')">
-    <span class="icon">🎭</span>
-    <span>Talleres</span>
-  </div>
-  <div class="mobile-nav-item" id="mnav-eventos" onclick="mobileNav('eventos')">
-    <span class="icon">🎪</span>
-    <span>Eventos</span>
-  </div>
-  <div class="mobile-nav-item" id="mnav-bordereaux" onclick="mobileNav('bordereaux')">
-    <span class="icon">🧾</span>
-    <span>Bordereaux</span>
-  </div>
-  <div class="mobile-nav-item" id="mnav-egresos" onclick="mobileNav('egresos')">
-    <span class="icon">💸</span>
-    <span>Egresos</span>
-  </div>
-  <div class="mobile-nav-item" id="mnav-stock" onclick="mobileNav('stock')">
-    <span class="icon">📦</span>
-    <span>Stock</span>
-  </div>
-  <div class="mobile-nav-item" id="mnav-resultados" onclick="mobileNav('resultados')">
-    <span class="icon">📊</span>
-    <span>Resultados</span>
-  </div>
+  <div class="mobile-nav-item active" data-mod="talleres" onclick="setModule('talleres')"><span class="icon">🎓</span><span>Talleres</span></div>
+  <div class="mobile-nav-item" data-mod="teatro" onclick="setModule('teatro')"><span class="icon">🎭</span><span>Teatro</span></div>
+  <div class="mobile-nav-item" data-mod="alquileres" onclick="setModule('alquileres')"><span class="icon">🔑</span><span>Alquileres</span></div>
+  <div class="mobile-nav-item" data-mod="gestion" onclick="setModule('gestion')"><span class="icon">💰</span><span>Gestión</span></div>
+  <div class="mobile-nav-item" data-mod="resultados" onclick="setModule('resultados')"><span class="icon">📊</span><span>Resultados</span></div>
 </nav>
 
+
+<div id="guardando" style="display:none;position:fixed;right:14px;bottom:78px;z-index:999;background:var(--gris-card);border:1px solid var(--gris-borde);color:var(--gris-texto);font-size:.75rem;padding:6px 12px;border-radius:20px">💾 Guardando…</div>
 <!-- Toast container -->
 <div class="toast-container" id="toasts"></div>
 
@@ -1762,128 +1207,194 @@ let state = {
   alumnosTalleres: []
 };
 
-// ── INIT ─────────────────────────────────────────────────────
-async function init() {
-  setDefaultDate();
-  setDefaultMes();
-  state.eventos = [];
-  state.egresos = [];
-  state.bordereaux = [];
-  state.stock = [];
-  await Promise.all([
-    loadProfesores(),
-    loadTalleres(),
-    loadAlumnos(),
-    loadMovimientos(),
-    loadEventos(),
-    loadEgresos(),
-    loadBordereaux(),
-    loadStock(),
-    loadConfig()
-  ]);
-  updateBadges();
+// ── CAPA DE DATOS RÁPIDA ─────────────────────────────────────
+// Toda la data se baja de una vez y se guarda en CACHE. Las lecturas son instantáneas.
+// Las escrituras actualizan la pantalla al instante y se mandan a Google en segundo plano.
+const CACHE = {};
+const SIMPLE = { Profesor:'getProfesores', Movimiento:'getMovimientos', Funcion:'getFunciones', Entrada:'getEntradas',
+                 Alquiler:'getAlquileres', Egreso:'getEgresos', CostoFijo:'getCostosFijos' };
+let queue = Promise.resolve();
+let pendientes = 0;
+let tempSeq = 0;
+const idMap = {};
+
+function http(action, body) {
+  const url = body == null ? `${APPS_SCRIPT_URL}?action=${action}` : APPS_SCRIPT_URL;
+  const opts = body == null ? {} : { method: 'POST', body: JSON.stringify({ action, ...body }) };
+  return fetch(url, opts).then(r => r.json());
 }
 
-function setDefaultDate() {
-  const today = new Date().toISOString().split('T')[0];
-  const el = document.getElementById('mov-fecha');
-  if (el) el.value = today;
+function setGuardando() {
+  const el = document.getElementById('guardando');
+  if (el) el.style.display = pendientes > 0 ? 'block' : 'none';
+}
+window.addEventListener('beforeunload', e => { if (pendientes > 0) { e.preventDefault(); e.returnValue = ''; } });
+
+// Reemplaza IDs temporales (negativos) por el ID real que devolvió Google
+function sustituirIds(o) {
+  if (Array.isArray(o)) return o.map(sustituirIds);
+  if (o && typeof o === 'object') { const r = {}; for (const k in o) r[k] = sustituirIds(o[k]); return r; }
+  if (typeof o === 'number' && o < 0 && idMap[o]) return idMap[o];
+  if (typeof o === 'string' && /^-\d+$/.test(o) && idMap[o]) return idMap[o];
+  return o;
 }
 
-function setDefaultMes() {
-  const m = new Date().getMonth() + 1;
-  document.getElementById('liq-mes').value = m;
+function enqueue(action, body, onDone) {
+  pendientes++; setGuardando();
+  const p = queue.then(async () => {
+    let res;
+    try { res = await http(action, sustituirIds(body)); }
+    catch (err) { res = { error: 'Sin conexión' }; }
+    if (onDone) onDone(res);   // se ejecuta antes de seguir con el próximo envío
+    return res;
+  });
+  queue = p.then(() => {}, () => {});
+  return p.then(res => { pendientes--; setGuardando(); return res; });
 }
 
-// ── API ───────────────────────────────────────────────────────
-async function api(action, body = null) {
-  try {
-    if (body === null) {
-      const res = await fetch(`${APPS_SCRIPT_URL}?action=${action}`);
-      return await res.json();
-    } else {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action, ...body })
-      });
-      return await res.json();
-    }
-  } catch (err) {
-    toast('Error de conexión', 'error');
-    return { error: err.message };
+function aplicarFresh(res) {
+  if (res && res.fresh) {
+    for (const k in res.fresh) CACHE[k] = res.fresh[k];
+    sincronizarState();
   }
 }
 
-// ── LOAD ─────────────────────────────────────────────────────
-async function loadProfesores() {
-  const data = await api('getProfesores');
-  state.profesores = Array.isArray(data) ? data : [];
-  renderProfesores();
+function sincronizarState() {
+  state.profesores = CACHE.getProfesores || [];
+  state.talleres = CACHE.getTalleres || [];
+  state.alumnos = CACHE.getAlumnos || [];
+  state.movimientos = CACHE.getMovimientos || [];
+  state.funciones = CACHE.getFunciones || [];
+  state.entradas = CACHE.getEntradas || [];
+  state.alquileres = CACHE.getAlquileres || [];
+  state.egresos = CACHE.getEgresos || [];
+  state.costosFijos = CACHE.getCostosFijos || [];
 }
 
-async function loadTalleres() {
-  const data = await api('getTalleres');
-  state.talleres = Array.isArray(data) ? data : [];
-  renderTalleres();
-  renderProfesores(); // re-renderizar profesores con los talleres ya cargados
+async function resync() {
+  const todo = await http('getTodo').catch(() => null);
+  if (!todo || todo.error) return;
+  Object.assign(CACHE, todo);
+  sincronizarState();
+  renderTodo();
 }
 
-async function loadAlumnos() {
-  const data = await api('getAlumnos');
-  state.alumnos = Array.isArray(data) ? data : [];
-  renderAlumnos();
-  populateFiltroAlumno();
+async function api(action, body = null) {
+  if (body === null) {
+    if (CACHE[action]) return CACHE[action];
+    try {
+      const d = await http(action);
+      if (Array.isArray(d)) CACHE[action] = d;
+      return d;
+    } catch (err) { toast('Error de conexión', 'error'); return { error: err.message }; }
+  }
+  const m = action.match(/^(add|update|delete)(.+)$/);
+  const key = m && SIMPLE[m[2]];
+  if (key) return optimista(m[1], key, action, body);
+
+  // Borrar taller/alumno: se quita de la pantalla al instante
+  if (action === 'deleteTaller' || action === 'deleteAlumno') {
+    const k = action === 'deleteTaller' ? 'getTalleres' : 'getAlumnos';
+    const i = (CACHE[k] || []).findIndex(x => String(x.ID) === String(body.id));
+    if (i >= 0) CACHE[k].splice(i, 1);
+    enqueue(action, body).then(res => { if (res.error) { toast(res.error, 'error'); resync(); } else { aplicarFresh(res); renderTodo(); } });
+    return { success: true };
+  }
+  // Resto de las tablas compuestas: esperamos a Google, que devuelve todo actualizado
+  const res = await enqueue(action, body);
+  if (!res.error) aplicarFresh(res);
+  return res;
 }
 
-async function loadMovimientos() {
-  const data = await api('getMovimientos');
-  state.movimientos = Array.isArray(data) ? data : [];
+function optimista(op, key, action, body) {
+  const list = CACHE[key] || (CACHE[key] = []);
+  let temp = null;
+  if (op === 'add') { temp = -(++tempSeq); list.push({ ...body.row, ID: temp }); }
+  else if (op === 'update') { const r = list.find(x => String(x.ID) === String(body.id)); if (r) Object.assign(r, body.row); }
+  else { const i = list.findIndex(x => String(x.ID) === String(body.id)); if (i >= 0) list.splice(i, 1); }
+  const alTerminar = res => {
+    if (res.error || op !== 'add' || !res.id) return;
+    idMap[temp] = res.id;
+    if (typeof funcionActualId !== 'undefined' && funcionActualId === temp) funcionActualId = res.id;
+    for (const k in CACHE) if (Array.isArray(CACHE[k])) CACHE[k].forEach(r => {
+      for (const f in r) if (r[f] === temp) r[f] = res.id;
+    });
+  };
+  enqueue(action, body, alTerminar).then(res => {
+    if (res.error) { toast('No se pudo guardar: ' + res.error, 'error'); resync(); }
+  });
+  return Promise.resolve({ success: true, id: temp });
+}
+
+// ── LOAD (ahora instantáneos: leen del CACHE) ────────────────
+async function loadProfesores() { state.profesores = await api('getProfesores'); renderProfesores(); }
+async function loadTalleres() { state.talleres = await api('getTalleres'); renderTalleres(); renderProfesores(); }
+async function loadAlumnos() { state.alumnos = await api('getAlumnos'); }
+async function loadMovimientos() { state.movimientos = await api('getMovimientos'); }
+async function loadConfig() {
+  const data = await api('getConfig');
+  if (Array.isArray(data)) { const r = data.find(r => r.Clave === 'PIN'); if (r) pinSheet = String(r.Valor); }
+}
+
+function renderTodo() {
+  renderProfesores(); renderTalleres();
+  if (typeof tallerActualId !== 'undefined' && tallerActualId && document.getElementById('page-taller-detalle').classList.contains('active')) renderDetalleTaller();
+  updateBadges();
+  const act = (document.querySelector('.page.active') || {}).id;
+  if (act === 'page-teatro') renderTeatro();
+  if (act === 'page-funcion') renderFuncion();
+  if (act === 'page-alquileres') renderAlquileres();
+  if (act === 'page-gestion') renderGestion();
+  if (act === 'page-resultados') renderResultados();
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+async function init() {
+  setDefaultMes();
+  // 1) Mostrar al instante lo último que se vio (si existe)
+  try {
+    const guardado = JSON.parse(localStorage.getItem('brava_cache') || 'null');
+    if (guardado) { Object.assign(CACHE, guardado); sincronizarState(); loadConfigSync(); renderTodo(); }
+  } catch (e) {}
+  // 2) Traer todo de Google en una sola llamada
+  try {
+    const todo = await http('getTodo');
+    if (todo.error) throw new Error(todo.error);
+    if (pendientes === 0) { Object.assign(CACHE, todo); sincronizarState(); }
+  } catch (err) {
+    document.getElementById('toasts').insertAdjacentHTML('beforeend',
+      `<div class="toast error"><span>❌</span> No se pudo cargar. Revisá que el Apps Script esté actualizado y desplegado.</div>`);
+  }
+  loadConfigSync();
+  renderTodo();
+  try { localStorage.setItem('brava_cache', JSON.stringify(CACHE)); } catch (e) {}
+}
+function loadConfigSync() {
+  const data = CACHE.getConfig;
+  if (Array.isArray(data)) { const r = data.find(r => r.Clave === 'PIN'); if (r) pinSheet = String(r.Valor); }
+}
+setInterval(() => { try { if (pendientes === 0) localStorage.setItem('brava_cache', JSON.stringify(CACHE)); } catch (e) {} }, 15000);
+
+function setDefaultMes() {
+  const el = document.getElementById('liq-mes');
+  if (el) el.value = new Date().getMonth() + 1;
 }
 
 function updateBadges() {
-  const bp = document.getElementById('badge-prof');
-  const bt = document.getElementById('badge-talleres');
-  const ba = document.getElementById('badge-alumnos');
+  const bp = document.getElementById('badge-prof'), bt = document.getElementById('badge-talleres');
   if (bp) bp.textContent = state.profesores.length;
   if (bt) bt.textContent = state.talleres.length;
-  if (ba) ba.textContent = state.alumnos.length;
 }
 
 function irAProfesores() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-profesores').classList.add('active');
-  // En sidebar marcar activo
-  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  const profItem = document.querySelector('[onclick="showPage(\'profesores\', this)"]');
-  if (profItem) profItem.classList.add('active');
+  showPage('profesores', document.querySelector("[onclick=\"showPage('profesores', this)\"]"));
 }
 
-function mobileNav(mod) {
-  document.querySelectorAll('.mobile-nav-item').forEach(i => i.classList.remove('active'));
-  const el = document.getElementById(`mnav-${mod}`);
-  if (el) el.classList.add('active');
-
-  if (mod === 'talleres') {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-talleres').classList.add('active');
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  } else if (mod === 'eventos') {
-    switchModule_internal('eventos');
-  } else if (mod === 'bordereaux') {
-    switchModule_internal('bordereaux');
-  } else if (mod === 'egresos') {
-    switchModule_internal('egresos');
-  } else if (mod === 'stock') {
-    switchModule_internal('stock');
-  } else if (mod === 'resultados') {
-    abrirResultados();
-  }
+function tipoChip(tipo) {
+  return { pago: 'chip-verde', beca: 'chip-violeta', inscripcion: 'chip-amarillo', debito: 'chip-rojo' }[tipo] || 'chip-gris';
 }
-
-function switchModule_internal(mod) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(`page-${mod}`).classList.add('active');
-  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+function tipoLabel(tipo) {
+  return { pago: 'Pago', beca: 'Beca/Desc.', inscripcion: 'Inscripción', debito: 'Débito' }[tipo] || tipo;
 }
 
 // ── NAVEGACIÓN ────────────────────────────────────────────────
@@ -1891,40 +1402,29 @@ function showPage(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
   document.getElementById(`page-${page}`).classList.add('active');
-  el.classList.add('active');
-
-  if (page === 'cuentas') populateFiltroAlumno();
+  if (el) el.classList.add('active');
 }
 
-function switchModule(mod) {
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  if (mod === 'eventos') {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-eventos').classList.add('active');
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  } else if (mod === 'talleres') {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-profesores').classList.add('active');
-    document.querySelector('[onclick="showPage(\'profesores\', this)"]').classList.add('active');
-  } else if (mod === 'bordereaux') {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-bordereaux').classList.add('active');
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-    renderBordereaux();
-  } else if (mod === 'egresos') {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-egresos').classList.add('active');
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-  } else if (mod === 'stock') {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-stock').classList.add('active');
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+let moduloActual = 'talleres';
+function setModule(mod) {
+  moduloActual = mod;
+  document.querySelectorAll('.nav-tab,.mobile-nav-item').forEach(t => t.classList.toggle('active', t.dataset.mod === mod));
+  document.querySelector('.app').classList.toggle('no-side', mod !== 'talleres');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  if (mod === 'talleres') {
+    document.getElementById('page-talleres').classList.add('active');
+    document.querySelector("[onclick=\"showPage('talleres', this)\"]").classList.add('active');
   } else if (mod === 'resultados') {
-    document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
     abrirResultados();
+  } else {
+    document.getElementById(`page-${mod}`).classList.add('active');
+    ({ teatro: renderTeatro, alquileres: renderAlquileres, gestion: renderGestion })[mod]();
   }
+  window.scrollTo(0, 0);
 }
+
+
 
 // ── MODALES ───────────────────────────────────────────────────
 function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -2580,135 +2080,6 @@ async function deletePago(id, alumnoId) {
   setTimeout(() => renderHistorial(alumnoId), 100);
 }
 
-// ── RENDER ALUMNOS ────────────────────────────────────────────
-function renderAlumnos() {
-  const tbody = document.getElementById('list-alumnos');
-  const q = (document.getElementById('search-alumnos')?.value || '').toLowerCase();
-  const filtrados = state.alumnos.filter(a => a.Nombre?.toLowerCase().includes(q));
-
-  if (filtrados.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:2rem">Sin alumnos</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtrados.map(a => {
-    const inscripciones = a.talleres || [];
-    const activos = inscripciones.filter(t => t.Estado === 'activo');
-    return `
-    <tr>
-      <td><strong>${a.Nombre}</strong></td>
-      <td style="color:var(--gris-texto)">${a.Teléfono || '-'}</td>
-      <td>${activos.map(t => `<span class="alumno-taller-tag">${t.nombre_taller}</span>`).join('') || '<span style="color:var(--gris-texto)">Sin talleres</span>'}</td>
-      <td><span class="chip ${activos.length > 0 ? 'chip-verde' : 'chip-gris'}">${activos.length > 0 ? 'Activo' : 'Inactivo'}</span></td>
-      <td>
-        <div style="display:flex;gap:0.4rem">
-          <button class="btn btn-ghost btn-sm" onclick="editAlumno(${a.ID})">✏️</button>
-          <button class="btn btn-ghost btn-sm" onclick="verCC(${a.ID})">💰 CC</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteAlumno(${a.ID})">🗑</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-// ── CUENTA CORRIENTE ──────────────────────────────────────────
-function populateFiltroAlumno() {
-  const sel = document.getElementById('filtro-alumno-cc');
-  const movSel = document.getElementById('mov-alumno');
-  const opts = state.alumnos.map(a => `<option value="${a.ID}">${a.Nombre}</option>`).join('');
-  if (sel) sel.innerHTML = `<option value="">Seleccionar alumno...</option>` + opts;
-  if (movSel) movSel.innerHTML = opts;
-}
-
-function verCC(alumnoId) {
-  const sidebar = document.querySelector('[onclick="showPage(\'cuentas\', this)"]');
-  showPage('cuentas', sidebar);
-  document.getElementById('filtro-alumno-cc').value = alumnoId;
-  renderCuentaCorriente();
-}
-
-function renderCuentaCorriente() {
-  const alumnoId = document.getElementById('filtro-alumno-cc').value;
-  const container = document.getElementById('cc-contenido');
-
-  if (!alumnoId) {
-    container.innerHTML = `<div class="empty"><div class="icon">💳</div><p>Seleccioná un alumno</p></div>`;
-    return;
-  }
-
-  const alumno = state.alumnos.find(a => String(a.ID) === String(alumnoId));
-  const movs = state.movimientos.filter(m => String(m.ID_Alumno) === String(alumnoId));
-
-  // Calcular saldo
-  let saldo = 0;
-  movs.forEach(m => {
-    const monto = parseFloat(m.Monto) || 0;
-    if (m.Tipo === 'pago' || m.Tipo === 'beca') saldo += monto;
-    else saldo -= monto;
-  });
-
-  // Calcular tarifa mensual
-  const inscripciones = alumno?.talleres?.filter(t => t.Estado === 'activo') || [];
-  const tarifaTotal = inscripciones.reduce((acc, t) => {
-    const taller = state.talleres.find(ta => String(ta.ID) === String(t.ID_Taller));
-    return acc + (parseFloat(taller?.['Tarifa Mensual']) || 0);
-  }, 0);
-
-  container.innerHTML = `
-    <div class="cc-header">
-      <div class="saldo-box">
-        <div class="label">Saldo</div>
-        <div class="valor ${saldo >= 0 ? 'ok' : 'deuda'}">$${formatNum(Math.abs(saldo))}</div>
-        <div style="font-size:0.7rem;color:var(--gris-texto)">${saldo >= 0 ? 'A favor' : 'Deuda'}</div>
-      </div>
-      <div class="saldo-box">
-        <div class="label">Tarifa mensual</div>
-        <div class="valor" style="color:var(--amarillo)">$${formatNum(tarifaTotal)}</div>
-        <div style="font-size:0.7rem;color:var(--gris-texto)">${inscripciones.length} taller/es</div>
-      </div>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Concepto</th>
-            <th>Tipo</th>
-            <th>Monto</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${movs.length === 0
-            ? `<tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:2rem">Sin movimientos</td></tr>`
-            : movs.sort((a,b) => new Date(b.Fecha) - new Date(a.Fecha)).map(m => {
-                const esCredito = m.Tipo === 'pago' || m.Tipo === 'beca';
-                return `
-                <tr>
-                  <td>${formatFecha(m.Fecha)}</td>
-                  <td>${m.Concepto || '-'}</td>
-                  <td><span class="chip ${tipoChip(m.Tipo)}">${tipoLabel(m.Tipo)}</span></td>
-                  <td style="color:${esCredito ? 'var(--verde)' : 'var(--rojo)'};font-weight:600">
-                    ${esCredito ? '+' : '-'}$${formatNum(m.Monto)}
-                  </td>
-                  <td><button class="btn btn-danger btn-sm" onclick="deleteMovimiento(${m.ID})">🗑</button></td>
-                </tr>`;
-              }).join('')
-          }
-        </tbody>
-      </table>
-    </div>`;
-}
-
-function tipoChip(tipo) {
-  return { pago: 'chip-verde', beca: 'chip-violeta', inscripcion: 'chip-amarillo', debito: 'chip-rojo' }[tipo] || 'chip-gris';
-}
-
-function tipoLabel(tipo) {
-  return { pago: 'Pago', beca: 'Beca/Desc.', inscripcion: 'Inscripción', debito: 'Débito' }[tipo] || tipo;
-}
-
 // ── GUARDAR PROFESOR ──────────────────────────────────────────
 async function saveProfesor() {
   const id = document.getElementById('prof-id').value;
@@ -2986,53 +2357,6 @@ async function deleteAlumno(id) {
   }
 }
 
-// ── MOVIMIENTOS ───────────────────────────────────────────────
-function openModalMovimiento() {
-  populateFiltroAlumno();
-  cargarTalleresAlumno();
-  openModal('modal-movimiento');
-}
-
-function cargarTalleresAlumno() {
-  const alumnoId = document.getElementById('mov-alumno').value;
-  const sel = document.getElementById('mov-taller');
-  const alumno = state.alumnos.find(a => String(a.ID) === String(alumnoId));
-  const talleres = alumno?.talleres?.filter(t => t.Estado === 'activo') || [];
-  sel.innerHTML = talleres.map(t => `<option value="${t.ID_Taller}">${t.nombre_taller}</option>`).join('') ||
-    '<option value="">Sin talleres activos</option>';
-}
-
-async function saveMovimiento() {
-  const row = {
-    ID_Alumno: document.getElementById('mov-alumno').value,
-    ID_Taller: document.getElementById('mov-taller').value,
-    Fecha: document.getElementById('mov-fecha').value,
-    Tipo: document.getElementById('mov-tipo').value,
-    Monto: document.getElementById('mov-monto').value,
-    Concepto: document.getElementById('mov-concepto').value.trim()
-  };
-
-  if (!row.ID_Alumno || !row.Fecha || !row.Monto) {
-    toast('Completá alumno, fecha y monto', 'error'); return;
-  }
-
-  const res = await api('addMovimiento', { row });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Movimiento registrado');
-  closeModal('modal-movimiento');
-  await loadMovimientos();
-  renderCuentaCorriente();
-}
-
-async function deleteMovimiento(id) {
-  if (!confirm('¿Eliminar este movimiento?')) return;
-  const res = await api('deleteMovimiento', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Movimiento eliminado');
-  await loadMovimientos();
-  renderCuentaCorriente();
-}
-
 // ── LIQUIDACIÓN ───────────────────────────────────────────────
 async function generarLiquidacion() {
   const mes = document.getElementById('liq-mes').value;
@@ -3111,1676 +2435,614 @@ function formatNum(n) {
 
 function formatFecha(f) {
   if (!f) return '-';
-  const d = new Date(f);
-  return isNaN(d) ? f : d.toLocaleDateString('es-AR');
-}
-
-// ── EVENTOS ───────────────────────────────────────────────────
-let eventoActualId = null;
-let eTabActual = 'resumen';
-
-async function loadEventos() {
-  const data = await api('getEventos');
-  state.eventos = Array.isArray(data) ? data : [];
-  renderEventos();
-}
-
-function renderEventos() {
-  const container = document.getElementById('list-eventos');
-  const filtro = document.getElementById('filtro-estado-evento')?.value;
-  const lista = filtro ? state.eventos.filter(e => (e.Estado || '').toLowerCase() === filtro.toLowerCase()) : state.eventos;
-
-  if (lista.length === 0) {
-    container.innerHTML = `<div class="empty"><div class="icon">🎭</div><p>${filtro === 'cerrado' ? 'No hay eventos en el historial' : 'No hay eventos activos'}</p></div>`;
-    return;
-  }
-
-  container.innerHTML = `<div class="grid-2">${lista.map(ev => {
-    const reservas = ev.reservas || [];
-    const pagas = reservas.filter(r => r.Estado === 'paga').length;
-    const conSeña = reservas.filter(r => r.Estado === 'seña').length;
-    const sinPagar = reservas.filter(r => r.Estado === 'sin pagar').length;
-
-    const modeloChip = {
-      porcentaje: `<span class="chip chip-violeta">% Porcentaje</span>`,
-      alquiler: `<span class="chip chip-naranja">🏠 Alquiler fijo</span>`,
-      gratuito: `<span class="chip chip-gris">🎟 Gratuito</span>`
-    }[ev['Modelo de Negocio']] || '';
-
-    const estadoChip = ev.Estado === 'cerrado'
-      ? `<span class="chip chip-gris">Cerrado</span>`
-      : `<span class="chip chip-verde">Activo</span>`;
-
-    return `
-    <div class="card" style="cursor:pointer" onclick="abrirEvento(${ev.ID})">
-      <div class="card-header">
-        <div>
-          <div class="card-title">🎭 ${ev.Nombre}</div>
-          ${ev.Organizador ? `<div style="color:var(--gris-texto);font-size:0.8rem;margin-top:2px">${ev.Organizador}</div>` : ''}
-        </div>
-        <div class="card-actions" onclick="event.stopPropagation()">
-          ${estadoChip}
-          <button class="btn btn-danger btn-sm" onclick="deleteEvento(${ev.ID})">🗑</button>
-        </div>
-      </div>
-      <div class="card-meta">
-        ${ev.Fecha ? `<span class="chip chip-gris">📅 ${formatFecha(ev.Fecha)}</span>` : ''}
-        ${ev['Tipo de evento'] ? `<span class="chip chip-amarillo">${ev['Tipo de evento']}</span>` : ''}
-        ${modeloChip}
-      </div>
-      <div style="margin-top:0.75rem;display:flex;gap:1rem;font-size:0.8rem">
-        <span>🎟 <strong>${reservas.length}</strong> reservas</span>
-        <span style="color:var(--verde)">✅ ${pagas} pagas</span>
-        <span style="color:var(--amarillo)">💰 ${conSeña} con seña</span>
-        <span style="color:var(--gris-texto)">⏳ ${sinPagar} sin pagar</span>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
-}
-
-function abrirEvento(id) {
-  eventoActualId = id;
-  const ev = state.eventos.find(e => String(e.ID) === String(id));
-  if (!ev) return;
-
-  document.getElementById('detalle-evento-titulo').textContent = ev.Nombre.toUpperCase();
-  document.getElementById('detalle-evento-fecha').textContent = ev.Fecha ? formatFecha(ev.Fecha) : '';
-
-  const acciones = document.getElementById('detalle-evento-acciones');
-  if (ev.Estado === 'cerrado') {
-    acciones.innerHTML = `<span class="chip chip-gris" style="padding:0.5rem 1rem">Evento cerrado</span>`;
-  } else {
-    acciones.innerHTML = `
-      <button class="btn btn-ghost" onclick="openModalEditarEvento(${id})">✏️ Editar</button>
-      <button class="btn btn-primary" onclick="cerrarEventoActual()">✅ Cerrar evento</button>`;
-  }
-
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-evento-detalle').classList.add('active');
-
-  switchETab('reservas');
-}
-
-function volverEventos() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-eventos').classList.add('active');
-}
-
-function switchETab(tab) {
-  eTabActual = tab;
-  ['reservas','gastro','resultado'].forEach(t => {
-    document.getElementById(`etab-${t}`).classList.toggle('active', t === tab);
-    document.getElementById(`etab-content-${t}`).style.display = t === tab ? 'block' : 'none';
-  });
-  renderETab(tab);
-}
-
-function renderETab(tab) {
-  const ev = state.eventos.find(e => String(e.ID) === String(eventoActualId));
-  if (!ev) return;
-  const isCerrado = ev.Estado === 'cerrado';
-
-  if (tab === 'resumen') renderETabResumen(ev, isCerrado);
-  else if (tab === 'reservas') renderETabReservas(ev, isCerrado);
-  else if (tab === 'gastro') renderETabGastro(ev, isCerrado);
-  else if (tab === 'resultado') renderETabResultado(ev);
-}
-
-function renderETabResumen(ev, isCerrado) {
-  const reservas = ev.reservas || [];
-  const pagas = reservas.filter(r => r.Estado === 'paga');
-  const conSeña = reservas.filter(r => r.Estado === 'seña');
-  const precio = parseFloat(ev['Precio Entrada'] || ev['Precio entrada'] || 0);
-
-  const totalReservado = pagas.length * precio + conSeña.reduce((s,r) => s + parseFloat(r['Monto'] || 0), 0);
-
-  const modelo = ev['Modelo de Negocio'];
-  let infoModelo = '';
-  if (modelo === 'porcentaje') {
-    infoModelo = `<span class="chip chip-violeta">% Espacio: ${ev['% Espacio']}%</span> <span class="chip chip-naranja">% Organizador: ${ev['% Organizador']}%</span>`;
-  } else if (modelo === 'alquiler') {
-    infoModelo = `<span class="chip chip-naranja">Alquiler: $${formatNum(ev['Monto Alquiler'])}</span>`;
-  } else {
-    infoModelo = `<span class="chip chip-gris">Sin entrada</span>`;
-  }
-
-  document.getElementById('etab-content-resumen').innerHTML = `
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Total reservas</div>
-        <div class="stat-value amarillo">${reservas.length}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Reservas pagas</div>
-        <div class="stat-value verde">${pagas.length}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Con seña</div>
-        <div class="stat-value" style="color:var(--naranja)">${conSeña.length}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Recaudado (anticipado)</div>
-        <div class="stat-value amarillo">$${formatNum(totalReservado)}</div>
-      </div>
-    </div>
-    <div class="section-title">DATOS DEL EVENTO</div>
-    <div class="card">
-      <div class="card-meta" style="gap:0.75rem">
-        ${ev['Tipo de evento'] ? `<span class="chip chip-amarillo">${ev['Tipo de evento']}</span>` : ''}
-        ${infoModelo}
-        ${precio ? `<span class="chip chip-gris">Entrada: $${formatNum(precio)}</span>` : ''}
-        ${ev.Organizador ? `<span class="chip chip-gris">👤 ${ev.Organizador}</span>` : ''}
-      </div>
-    </div>`;
-}
-
-function renderETabReservas(ev, isCerrado) {
-  const reservas = ev.reservas || [];
-  const precio = parseFloat(ev['Precio Entrada'] || ev['Precio entrada'] || 0);
-
-  // Totales
-  const totalReservado = reservas.reduce((s,r) => s + parseInt(r['Cantidad'] || 1), 0);
-  const totalVino = reservas.reduce((s,r) => s + parseInt(r['Cantidad Vino'] ?? r['Cantidad'] ?? 1), 0);
-  const entradasPuerta = parseInt(ev['Entradas Puerta'] || 0);
-
-  let html = '';
-
-  // Stats rápidos
-  html += `
-  <div class="stats-row" style="margin-bottom:1rem">
-    <div class="stat-card">
-      <div class="stat-label">Reservas totales</div>
-      <div class="stat-value amarillo">${totalReservado}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Vinieron</div>
-      <div class="stat-value verde">${totalVino}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">No vinieron</div>
-      <div class="stat-value" style="color:var(--rojo)">${totalReservado - totalVino}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Entradas en puerta</div>
-      <div class="stat-value" style="color:var(--naranja)">${entradasPuerta}</div>
-    </div>
-  </div>`;
-
-  // Botones de acción
-  if (!isCerrado) {
-    html += `
-    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem;gap:0.75rem;flex-wrap:wrap">
-      <button class="btn btn-ghost" onclick="openModal('modal-entrada-puerta')" style="border-color:var(--naranja);color:var(--naranja)">🚪 + Entrada en puerta</button>
-      <button class="btn btn-primary" onclick="openModalReserva()">+ Nueva reserva</button>
-    </div>`;
-  }
-
-  // Tabla
-  html += `
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Tel.</th>
-          <th style="text-align:center">Reserv.</th>
-          <th style="text-align:center">Vinieron</th>
-          <th>Estado pago</th>
-          <th>Seña</th>
-          <th>Saldo</th>
-          ${!isCerrado ? '<th></th>' : ''}
-        </tr>
-      </thead>
-      <tbody>
-        ${reservas.length === 0
-          ? `<tr><td colspan="8" style="text-align:center;color:var(--gris-texto);padding:2rem">Sin reservas</td></tr>`
-          : reservas.map(r => {
-              const cantReservada = parseInt(r['Cantidad'] || 1);
-              const cantVino = parseInt(r['Cantidad Vino'] ?? cantReservada);
-              const seña = parseFloat(r['Seña'] || 0);
-              const saldoUnitario = r.Estado === 'paga' ? 0 : r.Estado === 'seña' ? precio - seña / cantReservada : precio;
-              const saldoTotal = saldoUnitario * cantVino - (r.Estado === 'seña' ? seña : 0);
-              const noVino = cantReservada - cantVino;
-
-              return `
-              <tr>
-                <td><strong>${r.Nombre}</strong></td>
-                <td style="color:var(--gris-texto);font-size:0.8rem">${r.Teléfono || '-'}</td>
-                <td style="text-align:center">
-                  <span class="chip chip-gris">${cantReservada}</span>
-                </td>
-                <td style="text-align:center">
-                  ${!isCerrado
-                    ? `<input type="number" min="0" max="${cantReservada}" value="${cantVino}"
-                        style="width:60px;text-align:center;background:${cantVino < cantReservada ? 'rgba(255,107,94,0.1)' : 'rgba(91,194,122,0.1)'};border-color:${cantVino < cantReservada ? 'rgba(255,107,94,0.4)' : 'rgba(91,194,122,0.4)'};color:${cantVino < cantReservada ? 'var(--rojo)' : 'var(--verde)'};border-radius:6px;padding:4px 6px;font-size:0.85rem"
-                        onchange="actualizarAsistencia(${r.ID}, this.value, ${cantReservada}, this)">`
-                    : `<span class="${cantVino < cantReservada ? 'chip chip-rojo' : 'chip chip-verde'}">${cantVino}</span>`
-                  }
-                </td>
-                <td><span class="chip ${estadoReservaChip(r.Estado)}">${r.Estado}</span></td>
-                <td style="font-size:0.85rem">${seña ? '$' + formatNum(seña) : '-'}</td>
-                <td style="font-size:0.85rem;color:${saldoTotal > 0 ? 'var(--naranja)' : 'var(--verde)'}">
-                  ${saldoTotal > 0 ? '$' + formatNum(saldoTotal) : '✅'}
-                </td>
-                ${!isCerrado ? `
-                <td>
-                  <div style="display:flex;gap:0.4rem">
-                    <button class="btn btn-ghost btn-sm" onclick="editarReserva(${r.ID})">✏️</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteReserva(${r.ID})">🗑</button>
-                  </div>
-                </td>` : ''}
-              </tr>`;
-            }).join('')
-        }
-      </tbody>
-    </table>
-  </div>`;
-
-  // Lista de entradas en puerta
-  const entradasPuertaList = ev.reservas_puerta || [];
-  if (entradasPuertaList.length > 0 || !isCerrado) {
-    html += `
-    <div class="section-title" style="margin-top:1.5rem">ENTRADAS EN PUERTA</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Nombre</th><th style="text-align:center">Cantidad</th><th>Estado</th>${!isCerrado ? '<th></th>' : ''}</tr></thead>
-        <tbody>
-          ${entradasPuertaList.length === 0
-            ? `<tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1rem">Sin entradas en puerta registradas</td></tr>`
-            : entradasPuertaList.map(ep => `
-              <tr>
-                <td>${ep.Nombre || '<span style="color:var(--gris-texto)">—</span>'}</td>
-                <td style="text-align:center"><span class="chip chip-naranja">${ep.Cantidad || 1}</span></td>
-                <td><span class="chip ${ep.Estado === 'paga' ? 'chip-verde' : 'chip-rojo'}">${ep.Estado === 'paga' ? 'Pagó' : 'Sin pagar'}</span></td>
-                ${!isCerrado ? `<td><button class="btn btn-danger btn-sm" onclick="deleteEntradaPuerta(${ep.ID})">🗑</button></td>` : ''}
-              </tr>`).join('')
-          }
-        </tbody>
-      </table>
-    </div>`;
-  }
-
-  document.getElementById('etab-content-reservas').innerHTML = html;
-}
-
-function estadoReservaChip(estado) {
-  return { 'paga': 'chip-verde', 'seña': 'chip-amarillo', 'sin pagar': 'chip-gris' }[estado] || 'chip-gris';
-}
-
-async function actualizarAsistencia(reservaId, cantVino, cantReservada, inputEl) {
-  const val = parseInt(cantVino);
-  if (isNaN(val) || val < 0) return;
-  const cant = Math.min(val, cantReservada);
-  inputEl.value = cant;
-  inputEl.style.background = cant < cantReservada ? 'rgba(255,107,94,0.1)' : 'rgba(91,194,122,0.1)';
-  inputEl.style.borderColor = cant < cantReservada ? 'rgba(255,107,94,0.4)' : 'rgba(91,194,122,0.4)';
-  inputEl.style.color = cant < cantReservada ? 'var(--rojo)' : 'var(--verde)';
-
-  const res = await api('updateReserva', { id: reservaId, row: { 'Cantidad Vino': cant } });
-  if (res.error) { toast('Error al guardar', 'error'); return; }
-  // Actualizar state local sin recargar toda la lista
-  const ev = state.eventos.find(e => String(e.ID) === String(eventoActualId));
-  if (ev) {
-    const r = ev.reservas?.find(r => String(r.ID) === String(reservaId));
-    if (r) r['Cantidad Vino'] = cant;
-  }
-  // Actualizar solo el stat de asistencia sin rerenderizar toda la tabla
-  const totalReservado = ev.reservas.reduce((s,r) => s + parseInt(r['Cantidad'] || 1), 0);
-  const totalVino = ev.reservas.reduce((s,r) => s + parseInt(r['Cantidad Vino'] ?? r['Cantidad'] ?? 1), 0);
-}
-
-async function saveEntradaPuerta() {
-  const nombre = document.getElementById('puerta-nombre').value.trim();
-  const cantidad = parseInt(document.getElementById('puerta-cantidad').value) || 1;
-  const estado = document.getElementById('puerta-pago').value;
-
-  const row = {
-    ID_Evento: eventoActualId,
-    Nombre: nombre || '—',
-    Cantidad: cantidad,
-    Estado: estado,
-    'Medio de Pago': document.getElementById('puerta-medio-pago').value
-  };
-
-  const res = await api('addReservaPuerta', { row });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(`${cantidad} entrada${cantidad > 1 ? 's' : ''} registrada${cantidad > 1 ? 's' : ''} ✅`);
-  closeModal('modal-entrada-puerta');
-  document.getElementById('puerta-nombre').value = '';
-  document.getElementById('puerta-cantidad').value = '1';
-  document.getElementById('puerta-pago').value = 'paga';
-  await loadEventos();
-  renderETab('reservas');
-}
-
-async function deleteEntradaPuerta(id) {
-  if (!confirm('¿Eliminar esta entrada?')) return;
-  const res = await api('deleteReservaPuerta', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Entrada eliminada');
-  await loadEventos();
-  renderETab('reservas');
-}
-
-function renderETabGastro(ev, isCerrado) {
-  const compras = ev.gastro_compras || [];
-  const ventas = ev.gastro_ventas || [];
-
-  const totalCosto = compras.reduce((s,c) => s + parseFloat(c['Precio Costo'] || 0) * parseFloat(c.Cantidad || 0), 0);
-  const totalVenta = ventas.reduce((s,v) => s + parseFloat(v['Precio Venta'] || 0) * parseFloat(v['Cantidad Vendida'] || 0), 0);
-
-  document.getElementById('etab-content-gastro').innerHTML = `
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Invertido en productos</div>
-        <div class="stat-value" style="color:var(--rojo)">$${formatNum(totalCosto)}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Recaudado en ventas</div>
-        <div class="stat-value verde">$${formatNum(totalVenta)}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Resultado gastro</div>
-        <div class="stat-value ${totalVenta - totalCosto >= 0 ? 'verde' : ''}" style="${totalVenta - totalCosto < 0 ? 'color:var(--rojo)' : ''}">
-          $${formatNum(totalVenta - totalCosto)}
-        </div>
-      </div>
-    </div>
-
-    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
-      PRODUCTOS USADOS (del stock)
-      ${!isCerrado ? `<button class="btn btn-ghost btn-sm" onclick="openModalUsarStock()">📦 Tomar del stock</button>` : ''}
-    </div>
-    <div class="table-wrap" style="margin-bottom:1.5rem">
-      <table>
-        <thead><tr><th>Producto</th><th>Precio costo</th><th>Cantidad</th><th>Subtotal</th>${!isCerrado ? '<th></th>' : ''}</tr></thead>
-        <tbody>
-          ${compras.length === 0
-            ? `<tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin productos cargados</td></tr>`
-            : compras.map(c => `
-              <tr>
-                <td>${c.Producto}</td>
-                <td>$${formatNum(c['Precio Costo'])}</td>
-                <td>${c.Cantidad}</td>
-                <td>$${formatNum(parseFloat(c['Precio Costo']) * parseFloat(c.Cantidad))}</td>
-                ${!isCerrado ? `<td><button class="btn btn-danger btn-sm" onclick="deleteGastroCompra(${c.ID})">🗑</button></td>` : ''}
-              </tr>`).join('')
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
-      VENTAS
-      ${!isCerrado ? `<button class="btn btn-ghost btn-sm" onclick="openModalGastroVenta()">+ Registrar venta</button>` : ''}
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Producto</th><th>Precio venta</th><th>Cantidad</th><th>Subtotal</th>${!isCerrado ? '<th></th>' : ''}</tr></thead>
-        <tbody>
-          ${ventas.length === 0
-            ? `<tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin ventas registradas</td></tr>`
-            : ventas.map(v => `
-              <tr>
-                <td>${v.Producto}</td>
-                <td>$${formatNum(v['Precio Venta'])}</td>
-                <td>${v['Cantidad Vendida']}</td>
-                <td>$${formatNum(parseFloat(v['Precio Venta']) * parseFloat(v['Cantidad Vendida']))}</td>
-                ${!isCerrado ? `<td><button class="btn btn-danger btn-sm" onclick="deleteGastroVenta(${v.ID})">🗑</button></td>` : ''}
-              </tr>`).join('')
-          }
-        </tbody>
-      </table>
-    </div>`;
-}
-
-function renderETabResultado(ev) {
-  const reservas = ev.reservas || [];
-  const compras = ev.gastro_compras || [];
-  const ventas = ev.gastro_ventas || [];
-
-  const precio = parseFloat(ev['Precio Entrada'] || ev['Precio entrada'] || 0);
-  const modelo = ev['Modelo de Negocio'] || (ev['% Espacio'] ? 'porcentaje' : ev['Monto Alquiler'] ? 'alquiler' : 'gratuito');
-  const pctEspacio = parseFloat(ev['% Espacio'] || 0) / 100;
-
-  // Cantidad real que vino por reservas (usa Cantidad Vino si existe)
-  const totalReservado = reservas.reduce((s,r) => s + parseInt(r['Cantidad'] || 1), 0);
-  const totalVinoPorReserva = reservas.reduce((s,r) => s + parseInt(r['Cantidad Vino'] ?? r['Cantidad'] ?? 1), 0);
-  const entradasPuerta = parseInt(ev['Entradas Puerta'] || 0);
-  const totalAsistentes = totalVinoPorReserva + entradasPuerta;
-
-  let recaudacionEntradas = 0;
-  let paraEspacio = 0;
-  let paraOrganizador = 0;
-  let alquiler = 0;
-
-  if (modelo === 'porcentaje') {
-    recaudacionEntradas = totalAsistentes * precio;
-    paraEspacio = recaudacionEntradas * pctEspacio;
-    paraOrganizador = recaudacionEntradas * (1 - pctEspacio);
-  } else if (modelo === 'alquiler') {
-    alquiler = parseFloat(ev['Monto Alquiler'] || 0);
-    recaudacionEntradas = totalAsistentes * precio;
-    paraEspacio = alquiler;
-    paraOrganizador = recaudacionEntradas;
-  }
-
-  const totalCostoGastro = compras.reduce((s,c) => s + parseFloat(c['Precio Costo']||0) * parseFloat(c.Cantidad||0), 0);
-  const totalVentaGastro = ventas.reduce((s,v) => s + parseFloat(v['Precio Venta']||0) * parseFloat(v['Cantidad Vendida']||0), 0);
-  const resultadoGastro = totalVentaGastro - totalCostoGastro;
-  const totalEspacio = paraEspacio + resultadoGastro;
-
-  document.getElementById('etab-content-resultado').innerHTML = `
-    <div class="section-title">RESULTADO DEL EVENTO</div>
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Reservas originales</div>
-        <div class="stat-value" style="color:var(--gris-texto)">${totalReservado}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Vinieron por reserva</div>
-        <div class="stat-value amarillo">${totalVinoPorReserva}</div>
-        ${totalReservado !== totalVinoPorReserva ? `<div style="font-size:0.72rem;color:var(--rojo);margin-top:2px">↓ ${totalReservado - totalVinoPorReserva} no vinieron</div>` : ''}
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Entradas en puerta</div>
-        <div class="stat-value" style="color:var(--naranja)">${entradasPuerta}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total asistentes</div>
-        <div class="stat-value verde">${totalAsistentes}</div>
-      </div>
-    </div>
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Recaudación entradas</div>
-        <div class="stat-value amarillo">$${formatNum(recaudacionEntradas)}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Resultado gastronomía</div>
-        <div class="stat-value ${resultadoGastro >= 0 ? 'verde' : ''}" style="${resultadoGastro < 0 ? 'color:var(--rojo)' : ''}">
-          $${formatNum(resultadoGastro)}
-        </div>
-      </div>
-    </div>
-    <div class="section-title">DISTRIBUCIÓN</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-      <div class="card" style="border-color:rgba(232,88,43,0.3)">
-        <div style="font-size:0.7rem;color:var(--gris-texto);letter-spacing:1px;text-transform:uppercase;margin-bottom:0.5rem">Para el espacio</div>
-        <div style="font-family:'Bebas Neue';font-size:2rem;color:var(--amarillo)">$${formatNum(totalEspacio)}</div>
-        <div style="font-size:0.75rem;color:var(--gris-texto);margin-top:4px">
-          ${modelo === 'porcentaje' ? `${ev['% Espacio']}% entradas` : modelo === 'alquiler' ? 'Alquiler fijo' : 'Sin entrada'} + gastro
-        </div>
-      </div>
-      <div class="card" style="border-color:rgba(169,184,216,0.3)">
-        <div style="font-size:0.7rem;color:var(--gris-texto);letter-spacing:1px;text-transform:uppercase;margin-bottom:0.5rem">Para el organizador</div>
-        <div style="font-family:'Bebas Neue';font-size:2rem;color:#A9B8D8">$${formatNum(paraOrganizador)}</div>
-        <div style="font-size:0.75rem;color:var(--gris-texto);margin-top:4px">
-          ${modelo === 'porcentaje' ? `${ev['% Organizador']}% entradas` : modelo === 'alquiler' ? 'Total entradas vendidas' : '-'}
-        </div>
-      </div>
-    </div>`;
-}
-
-// ── CRUD EVENTOS ──────────────────────────────────────────────
-function openModalNuevoEvento() {
-  document.getElementById('evento-id').value = '';
-  document.getElementById('evento-nombre').value = '';
-  document.getElementById('evento-fecha').value = '';
-  document.getElementById('evento-tipo').value = '';
-  document.getElementById('evento-modelo').value = 'porcentaje';
-  document.getElementById('evento-precio').value = '';
-  document.getElementById('evento-pct-espacio').value = '';
-  document.getElementById('evento-pct-organizador').value = '';
-  document.getElementById('evento-alquiler').value = '';
-  document.getElementById('evento-precio-alquiler').value = '';
-  document.getElementById('evento-organizador').value = '';
-  document.getElementById('modal-evento-title').textContent = 'NUEVO EVENTO';
-  toggleEventoModelo();
-  openModal('modal-evento');
-}
-
-function openModalEditarEvento(id) {
-  const ev = state.eventos.find(e => String(e.ID) === String(id));
-  if (!ev) return;
-  document.getElementById('evento-id').value = ev.ID;
-  document.getElementById('evento-nombre').value = ev.Nombre || '';
-  document.getElementById('evento-fecha').value = ev.Fecha || '';
-  document.getElementById('evento-tipo').value = ev['Tipo de evento'] || '';
-  document.getElementById('evento-modelo').value = ev['Modelo de Negocio'] || 'porcentaje';
-  document.getElementById('evento-precio').value = ev['Precio Entrada'] || '';
-  document.getElementById('evento-pct-espacio').value = ev['% Espacio'] || '';
-  document.getElementById('evento-pct-organizador').value = ev['% Organizador'] || '';
-  document.getElementById('evento-alquiler').value = ev['Monto Alquiler'] || '';
-  document.getElementById('evento-precio-alquiler').value = ev['Precio entrada'] || '';
-  document.getElementById('evento-organizador').value = ev.Organizador || '';
-  document.getElementById('modal-evento-title').textContent = 'EDITAR EVENTO';
-  toggleEventoModelo();
-  openModal('modal-evento');
-}
-
-function toggleEventoModelo() {
-  const modelo = document.getElementById('evento-modelo').value;
-  document.getElementById('evento-campos-porcentaje').style.display = modelo === 'porcentaje' ? 'block' : 'none';
-  document.getElementById('evento-campos-alquiler').style.display = modelo === 'alquiler' ? 'block' : 'none';
-}
-
-function calcPctOrganizador() {
-  const pctEspacio = parseFloat(document.getElementById('evento-pct-espacio').value) || 0;
-  document.getElementById('evento-pct-organizador').value = Math.max(0, 100 - pctEspacio);
-}
-
-async function saveEvento() {
-  const id = document.getElementById('evento-id').value;
-  const modelo = document.getElementById('evento-modelo').value;
-  const row = {
-    Nombre: document.getElementById('evento-nombre').value.trim(),
-    Fecha: document.getElementById('evento-fecha').value,
-    'Tipo de evento': document.getElementById('evento-tipo').value,
-    'Modelo de Negocio': modelo,
-    'Precio Entrada': modelo === 'porcentaje' ? document.getElementById('evento-precio').value : '',
-    '% Espacio': modelo === 'porcentaje' ? document.getElementById('evento-pct-espacio').value : '',
-    '% Organizador': modelo === 'porcentaje' ? document.getElementById('evento-pct-organizador').value : '',
-    'Monto Alquiler': modelo === 'alquiler' ? document.getElementById('evento-alquiler').value : '',
-    'Precio entrada': modelo === 'alquiler' ? document.getElementById('evento-precio-alquiler').value : '',
-    Organizador: document.getElementById('evento-organizador').value.trim(),
-    Estado: 'activo'
-  };
-
-  if (!row.Nombre) { toast('El nombre es obligatorio', 'error'); return; }
-
-  const action = id ? 'updateEvento' : 'addEvento';
-  const body = id ? { id, row } : { row };
-  const res = await api(action, body);
-
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(id ? 'Evento actualizado' : 'Evento creado');
-  closeModal('modal-evento');
-  await loadEventos();
-
-  if (!id) abrirEvento(res.id);
-  else { renderETab(eTabActual); }
-}
-
-async function deleteEvento(id) {
-  if (!confirm('¿Eliminar este evento y todos sus datos?')) return;
-  const res = await api('deleteEvento', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Evento eliminado');
-  await loadEventos();
-}
-
-async function cerrarEventoActual() {
-  if (!confirm('¿Cerrar este evento? Quedará en el historial y no se podrá editar.')) return;
-  const res = await api('cerrarEvento', { id: eventoActualId });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Evento cerrado y guardado en historial');
-  await loadEventos();
-  abrirEvento(eventoActualId);
-}
-
-// ── RESERVAS ──────────────────────────────────────────────────
-function openModalReserva() {
-  document.getElementById('reserva-id').value = '';
-  document.getElementById('reserva-nombre').value = '';
-  document.getElementById('reserva-tel').value = '';
-  document.getElementById('reserva-cantidad').value = '1';
-  document.getElementById('reserva-estado').value = 'sin pagar';
-  document.getElementById('reserva-seña').value = '';
-  document.getElementById('modal-reserva-title').textContent = 'NUEVA RESERVA';
-  toggleSeña();
-  openModal('modal-reserva');
-}
-
-function editarReserva(id) {
-  const ev = state.eventos.find(e => String(e.ID) === String(eventoActualId));
-  const r = ev?.reservas?.find(r => String(r.ID) === String(id));
-  if (!r) return;
-  document.getElementById('reserva-id').value = r.ID;
-  document.getElementById('reserva-nombre').value = r.Nombre || '';
-  document.getElementById('reserva-tel').value = r.Teléfono || '';
-  document.getElementById('reserva-cantidad').value = r['Cantidad'] || '1';
-  document.getElementById('reserva-estado').value = r.Estado || 'sin pagar';
-  document.getElementById('reserva-seña').value = r['Seña'] || '';
-  document.getElementById('reserva-medio-pago').value = r['Medio de Pago'] || 'Efectivo';
-  document.getElementById('modal-reserva-title').textContent = 'EDITAR RESERVA';
-  toggleSeña();
-  openModal('modal-reserva');
-}
-
-function toggleSeña() {
-  const estado = document.getElementById('reserva-estado').value;
-  document.getElementById('campo-seña').style.display = estado === 'seña' ? 'block' : 'none';
-}
-
-async function saveReserva() {
-  const id = document.getElementById('reserva-id').value;
-  const cantidad = parseInt(document.getElementById('reserva-cantidad').value) || 1;
-  const row = {
-    ID_Evento: eventoActualId,
-    Nombre: document.getElementById('reserva-nombre').value.trim(),
-    Teléfono: document.getElementById('reserva-tel').value.trim(),
-    Cantidad: cantidad,
-    'Cantidad Vino': cantidad,
-    Estado: document.getElementById('reserva-estado').value,
-    Monto: 0,
-    Seña: document.getElementById('reserva-seña').value || 0,
-    'Medio de Pago': document.getElementById('reserva-medio-pago').value
-  };
-  if (!row.Nombre) { toast('El nombre es obligatorio', 'error'); return; }
-
-  const action = id ? 'updateReserva' : 'addReserva';
-  const body = id ? { id, row } : { row };
-  const res = await api(action, body);
-
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(id ? 'Reserva actualizada' : 'Reserva agregada');
-  closeModal('modal-reserva');
-  await loadEventos();
-  renderETab('reservas');
-}
-
-async function deleteReserva(id) {
-  if (!confirm('¿Eliminar esta reserva?')) return;
-  const res = await api('deleteReserva', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Reserva eliminada');
-  await loadEventos();
-  renderETab('reservas');
-}
-
-// ── GASTRO ────────────────────────────────────────────────────
-function openModalGastroCompra() {
-  document.getElementById('gastro-compra-id').value = '';
-  document.getElementById('gastro-compra-producto').value = '';
-  document.getElementById('gastro-compra-precio').value = '';
-  document.getElementById('gastro-compra-cantidad').value = '';
-  document.getElementById('modal-gastro-compra-title').textContent = 'PRODUCTO COMPRADO';
-  openModal('modal-gastro-compra');
-}
-
-function openModalGastroVenta() {
-  document.getElementById('gastro-venta-id').value = '';
-  document.getElementById('gastro-venta-producto').value = '';
-  document.getElementById('gastro-venta-precio').value = '';
-  document.getElementById('gastro-venta-cantidad').value = '';
-  document.getElementById('modal-gastro-venta-title').textContent = 'REGISTRAR VENTA';
-  openModal('modal-gastro-venta');
-}
-
-async function saveGastroCompra() {
-  const id = document.getElementById('gastro-compra-id').value;
-  const row = {
-    ID_Evento: eventoActualId,
-    Producto: document.getElementById('gastro-compra-producto').value.trim(),
-    'Precio Costo': document.getElementById('gastro-compra-precio').value,
-    Cantidad: document.getElementById('gastro-compra-cantidad').value
-  };
-  if (!row.Producto) { toast('El producto es obligatorio', 'error'); return; }
-  const action = id ? 'updateGastroCompra' : 'addGastroCompra';
-  const body = id ? { id, row } : { row };
-  const res = await api(action, body);
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Producto guardado');
-  closeModal('modal-gastro-compra');
-  await loadEventos();
-  renderETab('gastro');
-}
-
-async function saveGastroVenta() {
-  const id = document.getElementById('gastro-venta-id').value;
-  const row = {
-    ID_Evento: eventoActualId,
-    Producto: document.getElementById('gastro-venta-producto').value.trim(),
-    'Precio Venta': document.getElementById('gastro-venta-precio').value,
-    'Cantidad Vendida': document.getElementById('gastro-venta-cantidad').value
-  };
-  if (!row.Producto) { toast('El producto es obligatorio', 'error'); return; }
-  const action = id ? 'updateGastroVenta' : 'addGastroVenta';
-  const body = id ? { id, row } : { row };
-  const res = await api(action, body);
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Venta registrada');
-  closeModal('modal-gastro-venta');
-  await loadEventos();
-  renderETab('gastro');
-}
-
-async function deleteGastroCompra(id) {
-  if (!confirm('¿Eliminar este producto?')) return;
-  const res = await api('deleteGastroCompra', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Producto eliminado');
-  await loadEventos();
-  renderETab('gastro');
-}
-
-async function deleteGastroVenta(id) {
-  if (!confirm('¿Eliminar esta venta?')) return;
-  const res = await api('deleteGastroVenta', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Venta eliminada');
-  await loadEventos();
-  renderETab('gastro');
-}
-
-// ── STOCK ─────────────────────────────────────────────────────
-async function loadStock() {
-  const data = await api('getStock');
-  state.stock = Array.isArray(data) ? data : [];
-  renderStock();
-}
-
-function renderStock() {
-  const lista = state.stock || [];
-  const totalValor = lista.reduce((s,p) => s + parseFloat(p['Precio Costo']||0) * parseFloat(p['Cantidad Disponible']||0), 0);
-
-  document.getElementById('stock-stats').innerHTML = `
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Productos en stock</div>
-        <div class="stat-value amarillo">${lista.length}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Valor total del stock</div>
-        <div class="stat-value" style="color:var(--naranja)">$${formatNum(totalValor)}</div>
-      </div>
-    </div>`;
-
-  const tbody = document.getElementById('list-stock');
-  if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--gris-texto);padding:2rem">Sin productos en stock</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = lista.map(p => {
-    const cant = parseFloat(p['Cantidad Disponible'] || 0);
-    const valor = parseFloat(p['Precio Costo'] || 0) * cant;
-    const rend = parseFloat(p.Rendimiento || 1);
-    const costoVenta = rend > 1 ? parseFloat(p['Precio Costo'] || 0) / rend : null;
-    return `
-    <tr>
-      <td>
-        <strong>${p.Producto}</strong>
-        ${rend > 1 ? `<div style="font-size:0.72rem;color:var(--gris-texto)">1 ${p.Unidad || 'u'} = ${rend} ${p['Unidad Venta'] || 'u. venta'}</div>` : ''}
-      </td>
-      <td>
-        $${formatNum(p['Precio Costo'])}
-        ${costoVenta ? `<div style="font-size:0.72rem;color:var(--gris-texto)">$${formatNum(costoVenta)} / ${p['Unidad Venta'] || 'u'}</div>` : ''}
-      </td>
-      <td style="color:var(--gris-texto)">${p.Unidad || '-'}</td>
-      <td style="text-align:center">
-        <span class="chip ${cant === 0 ? 'chip-rojo' : cant <= 3 ? 'chip-naranja' : 'chip-verde'}">${cant}</span>
-      </td>
-      <td style="color:var(--amarillo)">$${formatNum(valor)}</td>
-      <td>
-        <div style="display:flex;gap:0.4rem">
-          <button class="btn btn-ghost btn-sm" onclick="editStock(${p.ID})">✏️</button>
-          <button class="btn btn-ghost btn-sm" title="Ajustar stock" onclick="ajustarStock(${p.ID}, ${cant})">⚖️</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteStock(${p.ID})">🗑</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function calcCostoVenta() {
-  const precio = parseFloat(document.getElementById('stock-precio').value) || 0;
-  const rend = parseFloat(document.getElementById('stock-rendimiento').value) || 1;
-  const costoVenta = rend > 0 ? precio / rend : 0;
-  const el = document.getElementById('stock-costo-venta');
-  const elVal = document.getElementById('stock-costo-venta-valor');
-  if (precio > 0 && rend > 1) {
-    el.style.display = 'block';
-    elVal.textContent = '$' + formatNum(costoVenta);
-  } else {
-    el.style.display = 'none';
-  }
-}
-
-function openModalStock() {
-  document.getElementById('stock-id').value = '';
-  document.getElementById('stock-producto').value = '';
-  document.getElementById('stock-precio').value = '';
-  document.getElementById('stock-unidad').value = '';
-  document.getElementById('stock-rendimiento').value = '1';
-  document.getElementById('stock-unidad-venta').value = '';
-  document.getElementById('stock-cantidad').value = '';
-  document.getElementById('stock-costo-venta').style.display = 'none';
-  document.getElementById('modal-stock-title').textContent = 'AGREGAR AL STOCK';
-  openModal('modal-stock');
-}
-
-function editStock(id) {
-  const p = state.stock.find(p => String(p.ID) === String(id));
-  if (!p) return;
-  document.getElementById('stock-id').value = p.ID;
-  document.getElementById('stock-producto').value = p.Producto || '';
-  document.getElementById('stock-precio').value = p['Precio Costo'] || '';
-  document.getElementById('stock-unidad').value = p.Unidad || '';
-  document.getElementById('stock-rendimiento').value = p.Rendimiento || '1';
-  document.getElementById('stock-unidad-venta').value = p['Unidad Venta'] || '';
-  document.getElementById('stock-cantidad').value = p['Cantidad Disponible'] || '';
-  document.getElementById('modal-stock-title').textContent = 'EDITAR STOCK';
-  calcCostoVenta();
-  openModal('modal-stock');
-}
-
-async function saveStock() {
-  const id = document.getElementById('stock-id').value;
-  const precio = parseFloat(document.getElementById('stock-precio').value) || 0;
-  const rendimiento = parseFloat(document.getElementById('stock-rendimiento').value) || 1;
-  const row = {
-    Producto: document.getElementById('stock-producto').value.trim(),
-    'Precio Costo': precio,
-    Unidad: document.getElementById('stock-unidad').value.trim(),
-    'Cantidad Disponible': document.getElementById('stock-cantidad').value,
-    Rendimiento: rendimiento,
-    'Unidad Venta': document.getElementById('stock-unidad-venta').value.trim()
-  };
-  if (!row.Producto) { toast('El producto es obligatorio', 'error'); return; }
-
-  let res;
-  if (id) {
-    res = await api('updateStock', { id, row });
-  } else {
-    res = await api('addStock', { row });
-  }
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(id ? 'Stock actualizado' : 'Stock agregado — egreso registrado automáticamente');
-  closeModal('modal-stock');
-  await Promise.all([loadStock(), loadEgresos()]);
-}
-
-async function ajustarStock(id, cantActual) {
-  const nueva = prompt(`Ajuste de inventario\nCantidad actual: ${cantActual}\nIngresá la cantidad correcta:`, cantActual);
-  if (nueva === null || nueva === '') return;
-  const cant = parseFloat(nueva);
-  if (isNaN(cant) || cant < 0) { toast('Cantidad inválida', 'error'); return; }
-  const res = await api('ajustarStock', { id, cantidad: cant });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(`Stock ajustado a ${cant}`);
-  await loadStock();
-}
-
-async function deleteStock(id) {
-  if (!confirm('¿Eliminar este producto del stock?')) return;
-  const res = await api('deleteStock', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Producto eliminado');
-  await loadStock();
-}
-
-// ── USAR STOCK EN EVENTO ──────────────────────────────────────
-function openModalUsarStock() {
-  const stock = state.stock || [];
-  if (stock.length === 0) {
-    toast('No hay productos en el stock', 'error'); return;
-  }
-
-  document.getElementById('usar-stock-lista').innerHTML = stock.map(p => {
-    const rend = parseFloat(p.Rendimiento || 1);
-    const costoVenta = rend > 1 ? parseFloat(p['Precio Costo'] || 0) / rend : parseFloat(p['Precio Costo'] || 0);
-    const unidadVenta = p['Unidad Venta'] || p.Unidad || 'u';
-    const cantDisp = parseFloat(p['Cantidad Disponible'] || 0);
-    const cantVentaDisp = cantDisp * rend;
-
-    return `
-    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;background:var(--negro);padding:0.75rem;border-radius:8px;border:1px solid var(--gris-borde)">
-      <div style="flex:1">
-        <div style="font-weight:600;font-size:0.9rem">${p.Producto}</div>
-        <div style="font-size:0.72rem;color:var(--gris-texto)">
-          $${formatNum(costoVenta)} / ${unidadVenta}
-          ${rend > 1 ? ` · ${cantDisp} ${p.Unidad || 'u'} disponibles (≈ ${cantVentaDisp} ${unidadVenta})` : ` · ${cantDisp} disponibles`}
-        </div>
-      </div>
-      <input type="number" min="0" max="${cantVentaDisp}" value="0" placeholder="0"
-        data-stock-id="${p.ID}"
-        data-precio-costo="${costoVenta}"
-        data-rendimiento="${rend}"
-        style="width:80px;text-align:center" class="uso-stock-input">
-      <span style="font-size:0.75rem;color:var(--gris-texto);min-width:40px">${unidadVenta}</span>
-    </div>`;
-  }).join('');
-
-  openModal('modal-usar-stock');
-}
-
-async function confirmarUsoStock() {
-  const inputs = document.querySelectorAll('.uso-stock-input');
-  const usos = [];
-  inputs.forEach(input => {
-    const cantVenta = parseFloat(input.value) || 0;
-    if (cantVenta > 0) {
-      const rend = parseFloat(input.dataset.rendimiento) || 1;
-      const cantCompra = cantVenta / rend; // convertir a unidades de compra
-      const precioCosto = parseFloat(input.dataset.precioCosto) || 0;
-      usos.push({
-        id_stock: input.dataset.stockId,
-        cantidad_usada: cantCompra,        // descuenta del stock en unidades de compra
-        cantidad_venta: cantVenta,          // para registro informativo
-        precio_costo_venta: precioCosto,   // costo real por unidad de venta
-        id_evento: eventoActualId
-      });
-    }
-  });
-
-  if (usos.length === 0) { toast('No seleccionaste ningún producto', 'error'); return; }
-
-  const res = await api('usarStockEvento', { usos });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(`${usos.length} producto/s registrado/s en el evento`);
-  closeModal('modal-usar-stock');
-  await Promise.all([loadStock(), loadEventos()]);
-  renderETab('gastro');
-}
-
-// ── EGRESOS ───────────────────────────────────────────────────
-async function loadEgresos() {
-  const data = await api('getEgresos');
-  state.egresos = Array.isArray(data) ? data : [];
-  renderEgresos();
-}
-
-function renderEgresos() {
-  const mes = document.getElementById('filtro-egreso-mes')?.value;
-  const anio = document.getElementById('filtro-egreso-anio')?.value;
-  const cat = document.getElementById('filtro-egreso-cat')?.value;
-
-  let lista = state.egresos || [];
-  if (mes) lista = lista.filter(e => {
-    const f = parseDate(e.Fecha);
-    return f && f.mes === parseInt(mes);
-  });
-  if (anio) lista = lista.filter(e => {
-    const f = parseDate(e.Fecha);
-    return f && f.anio === parseInt(anio);
-  });
-  if (cat) lista = lista.filter(e => e['Categoría'] === cat);
-
-  lista = lista.sort((a,b) => {
-    const fa = parseDate(a.Fecha), fb = parseDate(b.Fecha);
-    if (!fa || !fb) return 0;
-    return (fb.anio*10000 + fb.mes*100 + fb.dia) - (fa.anio*10000 + fa.mes*100 + fa.dia);
-  });
-
-  const ingresos = lista.filter(e => e.Tipo === 'ingreso');
-  const egresos = lista.filter(e => e.Tipo !== 'ingreso');
-
-  const totalIngresos = ingresos.reduce((s,e) => s + parseFloat(e.Monto || 0), 0);
-  const totalEgresos = egresos.reduce((s,e) => s + parseFloat(e.Monto || 0), 0);
-  const saldo = totalIngresos - totalEgresos;
-
-  document.getElementById('egresos-stats').innerHTML = '';
-
-  const renderFila = (e, esIngreso) => `
-    <tr>
-      <td>${formatFecha(e.Fecha)}</td>
-      <td><strong>${e.Concepto || '-'}</strong></td>
-      <td><span class="chip ${esIngreso ? 'chip-verde' : catChip(e['Categoría'])}">${e['Categoría'] || 'Otro'}</span></td>
-      <td style="color:var(--gris-texto);font-size:0.8rem">${e.Notas || '-'}</td>
-      <td style="color:${esIngreso ? 'var(--verde)' : 'var(--rojo)'};font-weight:600">
-        ${esIngreso ? '+' : '-'}$${formatNum(e.Monto)}
-      </td>
-      <td>
-        <div style="display:flex;gap:0.4rem">
-          <button class="btn btn-ghost btn-sm" onclick="editEgreso(${e.ID}, ${esIngreso})">✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteEgreso(${e.ID})">🗑</button>
-        </div>
-      </td>
-    </tr>`;
-
-  const tablaHeader = `<table style="width:100%;border-collapse:collapse">
-    <thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Notas</th><th>Monto</th><th></th></tr></thead><tbody>`;
-
-  const tbody = document.getElementById('list-egresos');
-
-  if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--gris-texto);padding:2rem">Sin movimientos</td></tr>`;
-    return;
-  }
-
-  // Mostrar todo junto ordenado por fecha
-  tbody.innerHTML = lista.map(e => renderFila(e, e.Tipo === 'ingreso')).join('');
-}
-
-function catChip(cat) {
-  return { 'Gasto fijo': 'chip-rojo', 'Gasto variable': 'chip-naranja', 'Inversión': 'chip-violeta', 'Otro': 'chip-gris' }[cat] || 'chip-gris';
-}
-
-function openModalIngreso() {
-  document.getElementById('ingreso-fecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('ingreso-categoria').value = 'Aporte';
-  document.getElementById('ingreso-concepto').value = '';
-  document.getElementById('ingreso-monto').value = '';
-  document.getElementById('ingreso-notas').value = '';
-  openModal('modal-ingreso');
-}
-
-async function saveIngreso() {
-  const row = {
-    Fecha: document.getElementById('ingreso-fecha').value,
-    Concepto: document.getElementById('ingreso-concepto').value.trim(),
-    Monto: document.getElementById('ingreso-monto').value,
-    'Categoría': document.getElementById('ingreso-categoria').value,
-    Notas: document.getElementById('ingreso-notas').value.trim(),
-    Tipo: 'ingreso'
-  };
-  if (!row.Concepto || !row.Monto) { toast('Concepto y monto son obligatorios', 'error'); return; }
-  const res = await api('addEgreso', { row });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Ingreso registrado ✅');
-  closeModal('modal-ingreso');
-  await loadEgresos();
-}
-
-function openModalEgreso() {
-  document.getElementById('egreso-id').value = '';
-  document.getElementById('egreso-fecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('egreso-categoria').value = 'Gasto fijo';
-  document.getElementById('egreso-concepto').value = '';
-  document.getElementById('egreso-monto').value = '';
-  document.getElementById('egreso-notas').value = '';
-  document.getElementById('modal-egreso-title').textContent = 'NUEVO EGRESO';
-  openModal('modal-egreso');
-}
-
-function editEgreso(id) {
-  const e = state.egresos.find(e => String(e.ID) === String(id));
-  if (!e) return;
-  document.getElementById('egreso-id').value = e.ID;
-  document.getElementById('egreso-fecha').value = e.Fecha || '';
-  document.getElementById('egreso-categoria').value = e['Categoría'] || 'Gasto fijo';
-  document.getElementById('egreso-concepto').value = e.Concepto || '';
-  document.getElementById('egreso-monto').value = e.Monto || '';
-  document.getElementById('egreso-notas').value = e.Notas || '';
-  document.getElementById('modal-egreso-title').textContent = 'EDITAR EGRESO';
-  openModal('modal-egreso');
-}
-
-async function saveEgreso() {
-  const id = document.getElementById('egreso-id').value;
-  const row = {
-    Fecha: document.getElementById('egreso-fecha').value,
-    Concepto: document.getElementById('egreso-concepto').value.trim(),
-    Monto: document.getElementById('egreso-monto').value,
-    'Categoría': document.getElementById('egreso-categoria').value,
-    Notas: document.getElementById('egreso-notas').value.trim()
-  };
-  if (!row.Concepto || !row.Monto) { toast('Concepto y monto son obligatorios', 'error'); return; }
-
-  const action = id ? 'updateEgreso' : 'addEgreso';
-  const body = id ? { id, row } : { row };
-  const res = await api(action, body);
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(id ? 'Egreso actualizado' : 'Egreso registrado');
-  closeModal('modal-egreso');
-  await loadEgresos();
-}
-
-async function deleteEgreso(id) {
-  if (!confirm('¿Eliminar este egreso?')) return;
-  const res = await api('deleteEgreso', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Egreso eliminado');
-  await loadEgresos();
+  const p = parseDate(f);
+  return p ? `${String(p.dia).padStart(2,'0')}/${String(p.mes).padStart(2,'0')}/${p.anio}` : f;
 }
 
 // ── PIN Y RESULTADOS ──────────────────────────────────────────
 let pinValido = false;
 let pinSheet = '1234';
 
-async function loadConfig() {
-  const data = await api('getConfig');
-  if (Array.isArray(data)) {
-    const pinRow = data.find(r => r.Clave === 'PIN');
-    if (pinRow) pinSheet = String(pinRow.Valor);
-  }
+// ═════════════════════════════════════════════════════════════
+// TEATRO · ALQUILERES · GESTIÓN · RESULTADOS
+// ═════════════════════════════════════════════════════════════
+const BDX = { argentores: 0.10, pctSala: 0.30, equipamiento: 50000, puestaLuces: 15000, seguro: 150000, capacidad: 40 };
+const ALQUILER_SUGERIDO = BDX.seguro * 2;
+const MESES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const num = v => parseFloat(v) || 0;
+const hoyISO = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+const mesDe = f => String(f || '').slice(0, 7);
+const esc = t => String(t ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function opcionesMeses(sel, fechas, conTodos) {
+  const set = new Set(fechas.map(mesDe).filter(Boolean));
+  set.add(hoyISO().slice(0,7));
+  const lista = [...set].sort().reverse();
+  const prev = sel.value, primera = !sel.dataset.init;
+  sel.dataset.init = '1';
+  sel.innerHTML = (conTodos ? '<option value="">Todos los meses</option>' : '') +
+    lista.map(m => `<option value="${m}">${MESES[parseInt(m.slice(5))]} ${m.slice(0,4)}</option>`).join('');
+  sel.value = (!primera && (lista.includes(prev) || (conTodos && prev === ''))) ? prev : lista[0];
 }
 
+// ═════════════ TEATRO: cálculo ═════════════
+function entradasDe(fId) { return (state.entradas || []).filter(e => String(e.ID_Funcion) === String(fId)); }
 
-// ── BORDEREAUX ───────────────────────────────────────────────
-const BDX = { argentores: 0.10, pctSala: 0.30, equipamiento: 50000, puestaLuces: 15000, seguro: 150000 };
-
-async function loadBordereaux() {
-  const data = await api('getBordereaux');
-  state.bordereauxError = (data && data.error) ? data.error : null;
-  state.bordereaux = Array.isArray(data) ? data : [];
-  renderBordereaux();
-}
-
-function bdxCalc(r) {
-  const n = v => parseFloat(v) || 0;
-  const rec = n(r.Entradas) * n(r.Precio) + n(r['Entradas solidarias']) * n(r['Precio solidaria']);
-  const arg = r.Argentores === 'No' ? 0 : rec * BDX.argentores;
+function funcCalc(f) {
+  const ents = entradasDe(f.ID);
+  const pagas = ents.filter(e => num(e.Monto) > 0);
+  const rec = pagas.reduce((s, e) => s + num(e.Monto), 0);
+  const porMedio = {};
+  pagas.forEach(e => { const m = e['Medio de pago'] || 'Otro'; porMedio[m] = (porMedio[m] || 0) + num(e.Monto); });
+  const arg = f.Argentores === 'No' ? 0 : rec * BDX.argentores;
   const neto = rec - arg;
-  const puesta = (r['Primera función'] === 'Sí' && r['Técnico'] !== 'Propio') ? BDX.puestaLuces : 0;
+  const puesta = (f['Primera función'] === 'Sí' && f['Técnico'] !== 'Propio') ? BDX.puestaLuces : 0;
   const porcentaje = neto * BDX.pctSala + BDX.equipamiento + puesta;
   const seguroAplica = BDX.seguro > porcentaje;
-  let brava = Math.max(porcentaje, BDX.seguro) - n(r['Brava absorbe']);
-  brava = Math.max(0, brava);
-  const ensayo = n(r['Ensayo cobrado']);
+  const brava = Math.max(0, Math.max(porcentaje, BDX.seguro) - num(f['Brava absorbe']));
+  const ensayo = num(f['Ensayo cobrado']);
   const elenco = neto - brava - ensayo;
-  return { rec, arg, neto, brava, ensayo, bravaTotal: brava + ensayo, elenco, seguroAplica, puesta,
+  return { ents, pagas, invitados: ents.length - pagas.length, rec, porMedio, arg, neto, porcentaje, puesta, seguroAplica, brava, ensayo,
+           bravaTotal: brava + ensayo, elenco, vacia: ents.length === 0,
            chequeo: Math.round(arg + brava + ensayo + elenco) === Math.round(rec) };
 }
 
-function bdxMeses() {
-  const set = new Set();
-  (state.bordereaux || []).forEach(r => { const f = String(r.Fecha || '').slice(0,7); if (f) set.add(f); });
-  set.add(new Date().toISOString().slice(0,7));
-  return [...set].sort().reverse();
-}
-
-function renderBordereaux() {
-  const el = document.getElementById('bdx-contenido');
+// ═════════════ TEATRO: lista de funciones ═════════════
+function renderTeatro() {
+  const el = document.getElementById('teatro-contenido');
   if (!el) return;
-  const selMes = document.getElementById('bdx-filtro-mes');
-  const prev = selMes.value;
-  const meses = bdxMeses();
-  selMes.innerHTML = '<option value="">Todos los meses</option>' + meses.map(m => `<option value="${m}">${m}</option>`).join('');
-  selMes.value = prev && (prev === '' || meses.includes(prev)) ? prev : meses[0];
-  const mes = selMes.value, estado = document.getElementById('bdx-filtro-estado').value;
-  let rows = (state.bordereaux || []).filter(r => (!mes || String(r.Fecha || '').slice(0,7) === mes) && (!estado || (r.Estado || 'Pendiente') === estado));
-  rows.sort((a,b) => String(b.Fecha).localeCompare(String(a.Fecha)));
-  const calc = rows.map(r => ({ r, c: bdxCalc(r) }));
-  const sum = f => calc.reduce((s,x) => s + f(x), 0);
-  const pend = calc.filter(x => (x.r.Estado || 'Pendiente') !== 'Liquidada');
-  const aPagarElencos = pend.filter(x => x.r['Opción'] !== 'B').reduce((s,x) => s + Math.max(0, x.c.elenco), 0);
-  const aPagarArg = sum(x => (x.r.Estado === 'Liquidada' ? 0 : x.c.arg * (x.r['Opción'] !== 'B' ? 1 : 0)));
-  const aCobrarElencos = pend.filter(x => x.r['Opción'] === 'B').reduce((s,x) => s + x.c.bravaTotal, 0);
-  const efectivoAPagar = aPagarElencos + aPagarArg;
+  const selMes = document.getElementById('teatro-mes');
+  opcionesMeses(selMes, (state.funciones || []).map(f => f.Fecha), true);
+  const mes = selMes.value, est = document.getElementById('teatro-estado').value;
+  const rows = (state.funciones || [])
+    .filter(f => (!mes || mesDe(f.Fecha) === mes) && (!est || (f.Estado || 'Pendiente') === est))
+    .sort((a, b) => String(b.Fecha).localeCompare(String(a.Fecha)))
+    .map(f => ({ f, c: funcCalc(f) }));
+  const pend = rows.filter(x => x.f.Estado !== 'Liquidada' && !x.c.vacia);
+  const aPagarElencos = pend.filter(x => x.f.Modalidad !== 'B').reduce((s, x) => s + Math.max(0, x.c.elenco), 0);
+  const aPagarArg = pend.filter(x => x.f.Modalidad !== 'B').reduce((s, x) => s + x.c.arg, 0);
+  const aCobrar = pend.filter(x => x.f.Modalidad === 'B').reduce((s, x) => s + x.c.bravaTotal, 0);
+  const suma = fn => rows.reduce((s, x) => s + fn(x.c), 0);
 
   el.innerHTML = `
-    ${state.bordereauxError ? `<div class="card" style="border-color:var(--rojo);margin-bottom:1rem;font-size:.85rem">No se pudo leer la solapa <strong>Bordereaux</strong>: ${state.bordereauxError}. Actualizá el Apps Script (ver instrucciones).</div>` : ''}
     <div class="stats-row">
       <div class="stat-card"><div class="stat-label">Funciones</div><div class="stat-value">${rows.length}</div></div>
-      <div class="stat-card"><div class="stat-label">Recaudado</div><div class="stat-value">$${formatNum(sum(x => x.c.rec))}</div></div>
-      <div class="stat-card"><div class="stat-label">Se queda en Brava</div><div class="stat-value verde">$${formatNum(sum(x => x.c.bravaTotal))}</div></div>
-      <div class="stat-card"><div class="stat-label">Va al elenco</div><div class="stat-value">$${formatNum(sum(x => x.c.elenco))}</div></div>
+      <div class="stat-card"><div class="stat-label">Recaudado</div><div class="stat-value">$${formatNum(suma(c => c.rec))}</div></div>
+      <div class="stat-card"><div class="stat-label">Se queda en Brava</div><div class="stat-value verde">$${formatNum(suma(c => c.bravaTotal))}</div></div>
+      <div class="stat-card"><div class="stat-label">Va al elenco</div><div class="stat-value">$${formatNum(suma(c => c.elenco))}</div></div>
     </div>
-    <div class="card" style="margin-bottom:1rem">
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.9rem">
-        <div>💵 Plata de elencos y Argentores que Brava tiene que pagar (Opción A pendiente): <strong>$${formatNum(efectivoAPagar)}</strong><span style="color:var(--gris-texto)"> · elencos $${formatNum(aPagarElencos)} + Argentores $${formatNum(aPagarArg)}</span></div>
-        <div>📥 A cobrar a elencos que vendieron (Opción B pendiente): <strong>$${formatNum(aCobrarElencos)}</strong></div>
-      </div>
+    <div class="card" style="margin-bottom:1rem;font-size:.9rem;display:flex;gap:1.5rem;flex-wrap:wrap">
+      <div>💵 Brava tiene que pagar (Opción A pendiente): <strong>$${formatNum(aPagarElencos + aPagarArg)}</strong>
+        <span style="color:var(--gris-texto)">· elencos $${formatNum(aPagarElencos)} + Argentores $${formatNum(aPagarArg)}</span></div>
+      <div>📥 A cobrar a elencos (Opción B pendiente): <strong>$${formatNum(aCobrar)}</strong></div>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Fecha</th><th>Obra</th><th>Op.</th><th>Recaudación</th><th>Argentores</th><th>Brava</th><th>Elenco</th><th>Estado</th><th></th></tr></thead>
-      <tbody>${calc.length ? calc.map(({r,c}) => {
-        const liq = r.Estado === 'Liquidada';
-        const quien = r['Opción'] === 'B'
-          ? `El elenco transfiere $${formatNum(c.bravaTotal)} a Brava`
-          : `Brava paga $${formatNum(Math.max(0,c.elenco))} al elenco y $${formatNum(c.arg)} a Argentores`;
-        return `<tr>
-          <td>${formatFecha(String(r.Fecha||'').slice(0,10))}</td>
-          <td><strong>${r.Obra || ''}</strong>${c.seguroAplica ? ' <span class="tag-precio">seguro de sala</span>' : ''}${c.chequeo ? '' : ' <span style="color:var(--rojo)">⚠ no cierra</span>'}
-            <div style="font-size:.72rem;color:var(--gris-texto)">${(r.Entradas||0)}${parseFloat(r['Entradas solidarias'])>0?' + '+r['Entradas solidarias']+' solid.':''} entradas${r['Técnico']==='Propio'?' · técnico propio':''}${r['Primera función']==='Sí'?' · 1ª función':''}</div>
-            <div style="font-size:.72rem;color:var(--gris-texto)">${liq ? 'Liquidada' + (r['Fecha pago'] ? ' el ' + formatFecha(String(r['Fecha pago']).slice(0,10)) : '') : quien}</div></td>
-          <td>${r['Opción'] || 'A'}</td>
-          <td>$${formatNum(c.rec)}</td>
-          <td>$${formatNum(c.arg)}</td>
-          <td style="color:var(--verde)">$${formatNum(c.bravaTotal)}${c.ensayo ? `<div style="font-size:.7rem;color:var(--gris-texto)">incl. ensayos $${formatNum(c.ensayo)}</div>` : ''}</td>
-          <td style="${c.elenco < 0 ? 'color:var(--rojo)' : ''}">$${formatNum(c.elenco)}${c.elenco < 0 ? '<div style="font-size:.7rem">el elenco debe a Brava</div>' : ''}</td>
-          <td>${liq ? '✅' : '⏳'}</td>
-          <td style="white-space:nowrap">
-            ${liq ? '' : `<button class="btn btn-primary btn-sm" onclick="liquidarBdx(${r.ID})">${r['Opción']==='B'?'Cobrado':'Pagado'}</button>`}
-            <button class="btn btn-ghost btn-sm" onclick="editBdx(${r.ID})">✏️</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteBdx(${r.ID})">🗑</button>
-          </td></tr>`; }).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--gris-texto);padding:2rem">Todavía no hay funciones cargadas</td></tr>'}
-      </tbody></table></div>
-    <div style="font-size:.75rem;color:var(--gris-texto);margin-top:.75rem">Chequeo: Argentores + Brava + Elenco = Recaudación en cada función. "Pagado" (A) significa que Brava ya le pagó al elenco y a Argentores; "Cobrado" (B) que el elenco ya transfirió a Brava.</div>`;
+      <thead><tr><th>Fecha</th><th>Obra</th><th>Op.</th><th>Entradas</th><th>Recaudación</th><th>Brava</th><th>Elenco</th><th>Estado</th></tr></thead>
+      <tbody>${rows.length ? rows.map(({ f, c }) => `
+        <tr style="cursor:pointer" onclick="abrirFuncion(${f.ID})">
+          <td>${formatFecha(f.Fecha)}</td>
+          <td><strong>${esc(f.Obra)}</strong>${c.seguroAplica && !c.vacia ? ' <span class="tag-precio">seguro de sala</span>' : ''}${!c.vacia && !c.chequeo ? ' <span style="color:var(--rojo)">⚠ no cierra</span>' : ''}</td>
+          <td>${f.Modalidad || 'A'}</td>
+          <td>${c.pagas.length}${c.invitados ? ` <span style="color:var(--gris-texto)">+ ${c.invitados} inv.</span>` : ''}</td>
+          <td>${c.vacia ? '—' : '$' + formatNum(c.rec)}</td>
+          <td style="color:var(--verde)">${c.vacia ? '—' : '$' + formatNum(c.bravaTotal)}</td>
+          <td style="${c.elenco < 0 ? 'color:var(--rojo)' : ''}">${c.vacia ? '—' : '$' + formatNum(c.elenco)}</td>
+          <td>${f.Estado === 'Liquidada' ? '✅' : '⏳'}</td>
+        </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--gris-texto);padding:2rem">Todavía no hay funciones. Tocá "+ Función".</td></tr>'}
+      </tbody></table></div>`;
 }
 
-function bdxFormRow() {
-  const g = id => document.getElementById(id).value;
-  return {
-    Fecha: g('bdx-fecha'), Obra: g('bdx-obra').trim(), 'Opción': g('bdx-opcion'),
-    Entradas: g('bdx-ent'), Precio: g('bdx-precio'),
-    'Entradas solidarias': g('bdx-sol'), 'Precio solidaria': g('bdx-psol'),
-    Argentores: g('bdx-arg'), 'Primera función': g('bdx-primera'), 'Técnico': g('bdx-tecnico'),
-    'Ensayo cobrado': g('bdx-ensayo'), 'Brava absorbe': g('bdx-ajuste'), Notas: g('bdx-notas')
-  };
+// ═════════════ TEATRO: crear / editar función ═════════════
+function openModalFuncion() {
+  ['func-id','func-obra','func-ensayo','func-ajuste','func-notas'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('func-fecha').value = hoyISO();
+  document.getElementById('func-modalidad').value = 'A';
+  document.getElementById('func-arg').value = 'Sí';
+  document.getElementById('func-primera').value = 'Sí';
+  document.getElementById('func-tecnico').value = 'Brava';
+  document.getElementById('func-precio').value = 15000;
+  document.getElementById('func-psol').value = 20000;
+  document.getElementById('func-obras').innerHTML = [...new Set((state.funciones || []).map(f => f.Obra))].map(o => `<option value="${esc(o)}">`).join('');
+  document.getElementById('modal-func-title').textContent = 'NUEVA FUNCIÓN';
+  openModal('modal-funcion');
 }
 
-function bdxPreview() {
-  const c = bdxCalc(bdxFormRow());
-  document.getElementById('bdx-preview').innerHTML = `
-    <div style="font-size:.85rem;line-height:1.7">
-      Recaudación <strong>$${formatNum(c.rec)}</strong><br>
-      Argentores <strong>$${formatNum(c.arg)}</strong><br>
-      Brava se queda <strong style="color:var(--verde)">$${formatNum(c.bravaTotal)}</strong>${c.seguroAplica ? ' <span class="tag-precio">seguro de sala</span>' : ''}<br>
-      Elenco recibe <strong style="${c.elenco < 0 ? 'color:var(--rojo)' : ''}">$${formatNum(c.elenco)}</strong>
-    </div>`;
+// Si la obra ya existe, copia sus condiciones de la última función
+function funcObraElegida() {
+  if (document.getElementById('func-id').value) return;
+  const nombre = document.getElementById('func-obra').value.trim().toLowerCase();
+  const prev = (state.funciones || []).filter(f => String(f.Obra).toLowerCase() === nombre).sort((a, b) => String(b.Fecha).localeCompare(String(a.Fecha)))[0];
+  if (!prev) return;
+  document.getElementById('func-modalidad').value = prev.Modalidad || 'A';
+  document.getElementById('func-arg').value = prev.Argentores || 'Sí';
+  document.getElementById('func-tecnico').value = prev['Técnico'] || 'Brava';
+  document.getElementById('func-precio').value = prev['Precio general'] || 15000;
+  document.getElementById('func-psol').value = prev['Precio solidaria'] || 20000;
+  document.getElementById('func-primera').value = 'No';
 }
 
-function openModalBdx() {
-  ['bdx-id','bdx-obra','bdx-ent','bdx-sol','bdx-ensayo','bdx-ajuste','bdx-notas'].forEach(i => document.getElementById(i).value = '');
-  document.getElementById('bdx-fecha').value = new Date().toISOString().split('T')[0];
-  document.getElementById('bdx-precio').value = 15000;
-  document.getElementById('bdx-psol').value = 20000;
-  ['bdx-opcion'].forEach(i => document.getElementById(i).value = 'A');
-  document.getElementById('bdx-arg').value = 'Sí';
-  document.getElementById('bdx-primera').value = 'No';
-  document.getElementById('bdx-tecnico').value = 'Brava';
-  document.getElementById('modal-bdx-title').textContent = 'NUEVA FUNCIÓN';
-  bdxPreview();
-  openModal('modal-bdx');
-}
-
-function editBdx(id) {
-  const r = state.bordereaux.find(x => String(x.ID) === String(id));
-  if (!r) return;
+function editFuncion(id) {
+  const f = state.funciones.find(x => String(x.ID) === String(id));
+  if (!f) return;
   const set = (i, v) => document.getElementById(i).value = v ?? '';
-  set('bdx-id', r.ID); set('bdx-fecha', String(r.Fecha || '').slice(0,10)); set('bdx-obra', r.Obra);
-  set('bdx-opcion', r['Opción'] || 'A'); set('bdx-ent', r.Entradas); set('bdx-precio', r.Precio);
-  set('bdx-sol', r['Entradas solidarias']); set('bdx-psol', r['Precio solidaria'] || 20000);
-  set('bdx-arg', r.Argentores || 'Sí'); set('bdx-primera', r['Primera función'] || 'No'); set('bdx-tecnico', r['Técnico'] || 'Brava');
-  set('bdx-ensayo', r['Ensayo cobrado']); set('bdx-ajuste', r['Brava absorbe']); set('bdx-notas', r.Notas);
-  document.getElementById('modal-bdx-title').textContent = 'EDITAR FUNCIÓN';
-  bdxPreview();
-  openModal('modal-bdx');
+  set('func-id', f.ID); set('func-obra', f.Obra); set('func-fecha', String(f.Fecha || '').slice(0, 10));
+  set('func-modalidad', f.Modalidad || 'A'); set('func-arg', f.Argentores || 'Sí');
+  set('func-primera', f['Primera función'] || 'No'); set('func-tecnico', f['Técnico'] || 'Brava');
+  set('func-precio', f['Precio general'] || 15000); set('func-psol', f['Precio solidaria'] || 20000);
+  set('func-ensayo', f['Ensayo cobrado']); set('func-ajuste', f['Brava absorbe']); set('func-notas', f.Notas);
+  document.getElementById('func-obras').innerHTML = '';
+  document.getElementById('modal-func-title').textContent = 'EDITAR FUNCIÓN';
+  openModal('modal-funcion');
 }
 
-async function saveBdx() {
-  const id = document.getElementById('bdx-id').value;
-  const row = bdxFormRow();
-  if (!row.Obra || !row.Fecha) { toast('Fecha y obra son obligatorias', 'error'); return; }
-  if (!id) row.Estado = 'Pendiente';
-  const res = await api(id ? 'updateBordereaux' : 'addBordereaux', id ? { id, row } : { row });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast(id ? 'Función actualizada' : 'Función registrada');
-  closeModal('modal-bdx');
-  await loadBordereaux();
-}
-
-async function liquidarBdx(id) {
-  const r = state.bordereaux.find(x => String(x.ID) === String(id));
-  if (!r) return;
-  const c = bdxCalc(r);
-  const msg = r['Opción'] === 'B'
-    ? `¿Confirmás que el elenco ya transfirió $${formatNum(c.bravaTotal)} a Brava?`
-    : `¿Confirmás que ya pagaste $${formatNum(Math.max(0,c.elenco))} al elenco y $${formatNum(c.arg)} a Argentores?`;
-  if (!confirm(msg)) return;
-  const res = await api('updateBordereaux', { id, row: { Estado: 'Liquidada', 'Fecha pago': new Date().toISOString().split('T')[0] } });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Función liquidada');
-  await loadBordereaux();
-}
-
-async function deleteBdx(id) {
-  if (!confirm('¿Eliminar esta función?')) return;
-  const res = await api('deleteBordereaux', { id });
-  if (res.error) { toast(res.error, 'error'); return; }
-  toast('Función eliminada');
-  await loadBordereaux();
-}
-
-// ── PUNTO DE EQUILIBRIO ──────────────────────────────────────
-function renderResultados() {
-  renderResultadosBase();
-  renderPE();
-  if (!state.costosFijosCargados) loadCostosFijos();
-}
-
-async function loadCostosFijos() {
-  state.costosFijosCargados = true;
-  const data = await api('getCostosFijos');
-  if (data && data.error) { state.costosFijosError = data.error; state.costosFijos = []; }
-  else { state.costosFijosError = null; state.costosFijos = Array.isArray(data) ? data : []; }
-  renderPE();
-}
-
-function peParams() {
-  let p = {};
-  try { p = JSON.parse(localStorage.getItem('brava_pe') || '{}'); } catch(e) {}
-  return { precio: p.precio || 15000, pctSala: p.pctSala ?? 40, funcionesMes: p.funcionesMes || 8 };
-}
-function peGuardarParams() {
-  const p = {
-    precio: parseFloat(document.getElementById('pe-precio').value) || 0,
-    pctSala: parseFloat(document.getElementById('pe-pct').value) || 0,
-    funcionesMes: parseFloat(document.getElementById('pe-func').value) || 1
-  };
-  try { localStorage.setItem('brava_pe', JSON.stringify(p)); } catch(e) {}
-  renderPE();
-}
-
-function renderPE() {
-  const el = document.getElementById('pe-contenido');
-  if (!el || !window._res) return;
-  const r = window._res;
-  const costos = state.costosFijos || [];
-  const totalFijo = costos.reduce((s,c) => s + (parseFloat(c.Monto) || 0), 0);
-  const hoy = new Date();
-  const meses = r.mes ? 1 : (r.anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12);
-  const fijoPeriodo = totalFijo * meses;
-  const ingreso = r.resTalleres + r.resEventos + r.ingresosExternos;
-  const cobertura = fijoPeriodo > 0 ? ingreso / fijoPeriodo * 100 : 0;
-  const falta = Math.max(0, fijoPeriodo - ingreso);
-  const color = fijoPeriodo === 0 ? 'var(--gris-texto)' : cobertura >= 100 ? 'var(--verde)' : cobertura >= 60 ? '#F2B134' : 'var(--rojo)';
-  const estado = fijoPeriodo === 0 ? 'Cargá tus costos fijos' : cobertura >= 100 ? 'EN EQUILIBRIO' : cobertura >= 60 ? 'CERCA' : 'LEJOS';
-  const p = peParams();
-  const netoEntrada = p.precio * (p.pctSala / 100);
-  const entradasFalta = netoEntrada > 0 ? Math.ceil(falta / netoEntrada) : 0;
-  const funcFalta = Math.ceil(entradasFalta / 40) || 0;
-  const tarifas = (r.talleres || []).map(t => (parseFloat(t['Tarifa Mensual']) || 0) * ((parseFloat(t['% Espacio']) || 50) / 100)).filter(x => x > 0);
-  const ticketAlumno = tarifas.length ? tarifas.reduce((a,b) => a+b, 0) / tarifas.length : 0;
-  const alumnosFalta = ticketAlumno > 0 ? Math.ceil(falta / ticketAlumno) : 0;
-  const pct = Math.min(100, cobertura);
-
-  el.innerHTML = `
-    <div class="section-title">PUNTO DE EQUILIBRIO</div>
-    ${state.costosFijosError ? `<div class="card" style="border-color:var(--rojo);margin-bottom:1rem;font-size:.85rem">No se pudo leer la solapa <strong>Costos_Fijos</strong>: ${state.costosFijosError}</div>` : ''}
-    <div class="stats-row">
-      <div class="stat-card"><div class="stat-label">Costos fijos ${r.mes ? 'del mes' : '(' + meses + ' meses)'}</div><div class="stat-value">$${formatNum(fijoPeriodo)}</div></div>
-      <div class="stat-card"><div class="stat-label">Ingresos del espacio</div><div class="stat-value verde">$${formatNum(ingreso)}</div></div>
-      <div class="stat-card" style="border-color:${color}"><div class="stat-label">Cobertura</div><div class="stat-value" style="color:${color}">${Math.round(cobertura)}%</div><div style="font-size:.72rem;color:${color};margin-top:4px;letter-spacing:1px">● ${estado}</div></div>
-      <div class="stat-card"><div class="stat-label">Falta para cubrir</div><div class="stat-value" style="color:${falta > 0 ? 'var(--rojo)' : 'var(--verde)'}">$${formatNum(falta)}</div></div>
-    </div>
-    <div style="height:10px;background:var(--gris-card);border-radius:6px;overflow:hidden;margin:-.5rem 0 1.25rem"><div style="height:100%;width:${pct}%;background:${color}"></div></div>
-
-    ${falta > 0 ? `
-    <div class="card" style="margin-bottom:1rem">
-      <div style="font-size:.8rem;color:var(--gris-texto);margin-bottom:.6rem">¿Cuánto falta, en cosas concretas?</div>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap">
-        <div><span class="tag-precio">${entradasFalta}</span> entradas a $${formatNum(p.precio)} (sala se queda ${p.pctSala}%)</div>
-        <div><span class="tag-precio">${funcFalta}</span> funciones llenas de 40</div>
-        <div><span class="tag-precio">${alumnosFalta}</span> alumnos más (aporte prom. $${formatNum(Math.round(ticketAlumno))})</div>
-      </div>
-    </div>` : ''}
-
-    <div class="card" style="margin-bottom:1rem">
-      <div style="font-size:.8rem;color:var(--gris-texto);margin-bottom:.6rem">Supuestos de cálculo (se guardan en este navegador)</div>
-      <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:end">
-        <label style="font-size:.75rem">Precio entrada<input id="pe-precio" type="number" value="${p.precio}" onchange="peGuardarParams()" style="width:120px;display:block"></label>
-        <label style="font-size:.75rem">% para la sala<input id="pe-pct" type="number" value="${p.pctSala}" onchange="peGuardarParams()" style="width:90px;display:block"></label>
-        <label style="font-size:.75rem">Funciones por mes<input id="pe-func" type="number" value="${p.funcionesMes}" onchange="peGuardarParams()" style="width:90px;display:block"></label>
-      </div>
-    </div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
-      <div style="font-weight:600">Costos fijos mensuales</div>
-      <button class="btn btn-primary btn-sm" onclick="peAgregar()">+ Agregar costo</button>
-    </div>
-    <div class="table-wrap" style="margin-bottom:2rem">
-      <table>
-        <thead><tr><th>Concepto</th><th>Categoría</th><th>Monto / mes</th><th></th></tr></thead>
-        <tbody>
-          ${costos.length === 0 ? `<tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin costos fijos cargados (alquiler, servicios, sueldos, ABL, etc.)</td></tr>` :
-            costos.map(c => `<tr>
-              <td><strong>${c.Concepto || ''}</strong></td>
-              <td style="color:var(--gris-texto)">${c['Categoría'] || ''}</td>
-              <td>$${formatNum(parseFloat(c.Monto) || 0)}</td>
-              <td style="text-align:right;white-space:nowrap">
-                <button class="btn btn-ghost btn-sm" onclick="peEditar(${c.ID})">✏️</button>
-                <button class="btn btn-danger btn-sm" onclick="peBorrar(${c.ID})">🗑</button>
-              </td></tr>`).join('')}
-          <tr><td colspan="2"><strong>TOTAL</strong></td><td><strong>$${formatNum(totalFijo)}</strong></td><td></td></tr>
-        </tbody>
-      </table>
-    </div>`;
-}
-
-async function peGuardarCosto(id, concepto, categoria, monto) {
-  const row = { Concepto: concepto, 'Categoría': categoria, Monto: monto };
-  const res = id ? await api('updateCostoFijo', { id, row }) : await api('addCostoFijo', { row });
-  if (res && res.error) { toast('Error: ' + res.error, 'error'); return; }
-  await loadCostosFijos();
-  toast('Costo guardado', 'success');
-}
-function peAgregar() {
-  const concepto = (window.prompt('Concepto (ej: Alquiler)') || '').trim();
-  if (!concepto) return;
-  const monto = parseFloat(window.prompt('Monto mensual en $'));
-  if (isNaN(monto)) return;
-  const categoria = (window.prompt('Categoría (ej: Alquiler, Servicios, Sueldos, Impuestos)') || '').trim();
-  peGuardarCosto(null, concepto, categoria, monto);
-}
-function peEditar(id) {
-  const c = (state.costosFijos || []).find(x => String(x.ID) === String(id));
-  if (!c) return;
-  const concepto = (window.prompt('Concepto', c.Concepto) || '').trim();
-  if (!concepto) return;
-  const monto = parseFloat(window.prompt('Monto mensual en $', c.Monto));
-  if (isNaN(monto)) return;
-  const categoria = (window.prompt('Categoría', c['Categoría'] || '') || '').trim();
-  peGuardarCosto(id, concepto, categoria, monto);
-}
-async function peBorrar(id) {
-  if (!confirm('¿Borrar este costo fijo?')) return;
-  const res = await api('deleteCostoFijo', { id });
-  if (res && res.error) { toast('Error: ' + res.error, 'error'); return; }
-  await loadCostosFijos();
-}
-
-function renderResultados_PLACEHOLDER(){}
-
-function abrirResultados() {
-  if (pinValido) {
-    mostrarPaginaResultados();
+async function saveFuncion() {
+  const g = i => document.getElementById(i).value;
+  const id = g('func-id');
+  const row = { Obra: g('func-obra').trim(), Fecha: g('func-fecha'), Modalidad: g('func-modalidad'), Argentores: g('func-arg'),
+    'Primera función': g('func-primera'), 'Técnico': g('func-tecnico'), 'Precio general': g('func-precio'), 'Precio solidaria': g('func-psol'),
+    'Ensayo cobrado': g('func-ensayo'), 'Brava absorbe': g('func-ajuste'), Notas: g('func-notas') };
+  if (!row.Obra || !row.Fecha) { toast('Falta la obra o la fecha', 'error'); return; }
+  closeModal('modal-funcion');
+  if (id) {
+    await api('updateFuncion', { id, row });
+    toast('Función actualizada');
+    if (document.getElementById('page-funcion').classList.contains('active')) renderFuncion(); else renderTeatro();
   } else {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-pin').classList.add('active');
-    document.getElementById('pin-input').value = '';
-    document.getElementById('pin-error').textContent = '';
-    setTimeout(() => document.getElementById('pin-input').focus(), 100);
+    row.Estado = 'Pendiente';
+    const r = await api('addFuncion', { row });
+    toast('Función creada');
+    abrirFuncion(r.id);
   }
 }
 
-async function validarPin() {
-  const input = document.getElementById('pin-input').value;
-  if (input === pinSheet) {
-    pinValido = true;
-    mostrarPaginaResultados();
-  } else {
+async function deleteFuncion(id) {
+  const n = entradasDe(id).length;
+  if (!confirm(n ? `Esta función tiene ${n} entradas cargadas. ¿Eliminarla igual?` : '¿Eliminar esta función?')) return;
+  state.entradas = CACHE.getEntradas = (CACHE.getEntradas || []).filter(e => String(e.ID_Funcion) !== String(id));
+  await api('deleteFuncion', { id });
+  toast('Función eliminada');
+  volverTeatro();
+}
+
+async function liquidarFuncion(id) {
+  const f = state.funciones.find(x => String(x.ID) === String(id));
+  const c = funcCalc(f);
+  const msg = f.Modalidad === 'B'
+    ? `¿Confirmás que el elenco ya transfirió $${formatNum(c.bravaTotal)} a Brava?`
+    : `¿Confirmás que ya pagaste $${formatNum(Math.max(0, c.elenco))} al elenco y $${formatNum(c.arg)} a Argentores?`;
+  if (!confirm(msg)) return;
+  await api('updateFuncion', { id, row: { Estado: 'Liquidada', 'Fecha pago': hoyISO() } });
+  toast('Función liquidada ✅');
+  renderFuncion();
+}
+
+// ═════════════ TEATRO: detalle de función ═════════════
+let funcionActualId = null, funcTab = 'entradas';
+
+function abrirFuncion(id) {
+  funcionActualId = id; funcTab = 'entradas';
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-funcion').classList.add('active');
+  renderFuncion();
+  window.scrollTo(0, 0);
+}
+function volverTeatro() { setModule('teatro'); }
+function switchFTab(t) { funcTab = t; renderFuncion(); }
+
+function renderFuncion() {
+  const el = document.getElementById('funcion-contenido');
+  const f = (state.funciones || []).find(x => String(x.ID) === String(funcionActualId));
+  if (!f) { volverTeatro(); return; }
+  const c = funcCalc(f);
+  const liq = f.Estado === 'Liquidada';
+  const lleno = c.ents.length;
+  const tabs = [['entradas', `🎟 Entradas (${c.pagas.length})`], ['invitados', `🎁 Invitados (${c.invitados})`], ['bordereaux', '🧾 Bordereaux']];
+  el.innerHTML = `
+    <div style="margin-bottom:1rem"><button class="btn btn-ghost btn-sm" onclick="volverTeatro()">← Teatro</button></div>
+    <div class="page-header" style="margin-bottom:1rem">
+      <div>
+        <div class="page-title">${esc(f.Obra).toUpperCase()}</div>
+        <div class="page-subtitle">${formatFecha(f.Fecha)} · Opción ${f.Modalidad || 'A'} ${f.Modalidad === 'B' ? '(el elenco vende)' : '(Brava vende)'} · ${lleno}/${BDX.capacidad} personas ${lleno > BDX.capacidad ? '<span style="color:var(--rojo)">⚠ supera la capacidad</span>' : ''}</div>
+      </div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-ghost btn-sm" onclick="editFuncion(${f.ID})">✏️ Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteFuncion(${f.ID})">🗑</button>
+      </div>
+    </div>
+    <div class="nav-tabs" style="margin-bottom:1rem">${tabs.map(([k, l]) => `<div class="nav-tab ${funcTab === k ? 'active' : ''}" onclick="switchFTab('${k}')">${l}</div>`).join('')}</div>
+    <div id="ftab"></div>`;
+  const tab = document.getElementById('ftab');
+  if (funcTab === 'bordereaux') tab.innerHTML = bordereauxHTML(f, c, liq);
+  else tab.innerHTML = listaEntradasHTML(f, c, funcTab === 'invitados');
+  if (funcTab !== 'bordereaux') { const n = document.getElementById('en-nombre'); if (n) n.focus(); }
+}
+
+function listaEntradasHTML(f, c, invitados) {
+  const lista = c.ents.filter(e => (num(e.Monto) > 0) !== invitados)
+    .sort((a, b) => num(b.ID) - num(a.ID));
+  const tipos = invitados ? ['Invitado elenco', '2x1', 'Promoción', 'Otro invitado'] : ['General', 'Solidaria', 'Otro precio'];
+  const total = lista.reduce((s, e) => s + num(e.Monto), 0);
+  return `
+    <div class="card" style="margin-bottom:1rem">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:end" onkeydown="if(event.key==='Enter')agregarEntrada(${invitados})">
+        <label style="font-size:.75rem">Nombre<input id="en-nombre" type="text" style="display:block;width:140px"></label>
+        <label style="font-size:.75rem">Apellido<input id="en-apellido" type="text" style="display:block;width:140px"></label>
+        <label style="font-size:.75rem">${invitados ? 'Motivo' : 'Tipo'}
+          <select id="en-tipo" onchange="entradaTipoCambio()" style="display:block">${tipos.map(t => `<option>${t}</option>`).join('')}</select></label>
+        ${invitados ? '' : `
+        <label style="font-size:.75rem">Pago
+          <select id="en-medio" style="display:block"><option>Efectivo</option><option>Transferencia</option><option>Mercado Pago</option></select></label>
+        <label style="font-size:.75rem">Monto<input id="en-monto" type="number" value="${num(f['Precio general'])}" style="display:block;width:110px"></label>`}
+        <button class="btn btn-primary" onclick="agregarEntrada(${invitados})">+ Agregar</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Nombre y apellido</th><th>${invitados ? 'Motivo' : 'Tipo'}</th>${invitados ? '' : '<th>Pago</th><th>Monto</th>'}<th></th></tr></thead>
+      <tbody>${lista.length ? lista.map((e, i) => `
+        <tr><td style="color:var(--gris-texto)">${lista.length - i}</td>
+          <td><strong>${esc(e.Nombre)} ${esc(e.Apellido)}</strong></td>
+          <td>${esc(e.Tipo)}</td>
+          ${invitados ? '' : `<td>${esc(e['Medio de pago'])}</td><td style="color:var(--amarillo);font-weight:600">$${formatNum(e.Monto)}</td>`}
+          <td><button class="btn btn-danger btn-sm" onclick="deleteEntrada(${e.ID})">🗑</button></td></tr>`).join('')
+        : `<tr><td colspan="6" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Todavía no hay ${invitados ? 'invitados' : 'entradas'} cargadas</td></tr>`}
+      </tbody>
+      ${invitados ? '' : `<tfoot><tr><td colspan="4" style="text-align:right;color:var(--gris-texto)">Total entradas</td><td style="font-weight:700">$${formatNum(total)}</td><td></td></tr></tfoot>`}
+    </table></div>`;
+}
+
+function entradaTipoCambio() {
+  const f = state.funciones.find(x => String(x.ID) === String(funcionActualId));
+  const t = document.getElementById('en-tipo').value, m = document.getElementById('en-monto');
+  if (!m) return;
+  if (t === 'General') m.value = num(f['Precio general']);
+  else if (t === 'Solidaria') m.value = num(f['Precio solidaria']);
+  else m.value = '';
+}
+
+async function agregarEntrada(invitados) {
+  const g = i => (document.getElementById(i) || {}).value || '';
+  const nombre = g('en-nombre').trim(), apellido = g('en-apellido').trim();
+  if (!nombre && !apellido) { toast('Cargá nombre y apellido', 'error'); return; }
+  const row = { ID_Funcion: funcionActualId, Nombre: nombre, Apellido: apellido, Tipo: g('en-tipo'),
+    'Medio de pago': invitados ? '' : g('en-medio'), Monto: invitados ? 0 : num(g('en-monto')), Fecha: hoyISO() };
+  if (!invitados && !row.Monto) { toast('Falta el monto', 'error'); return; }
+  api('addEntrada', { row });
+  const tipo = g('en-tipo'), medio = g('en-medio'), monto = g('en-monto');
+  renderFuncion();
+  document.getElementById('en-tipo').value = tipo;
+  if (!invitados) { document.getElementById('en-medio').value = medio; document.getElementById('en-monto').value = monto; }
+  document.getElementById('en-nombre').focus();
+}
+
+async function deleteEntrada(id) {
+  await api('deleteEntrada', { id });
+  renderFuncion();
+}
+
+function bordereauxHTML(f, c, liq) {
+  const L = (a, b, cls = '') => `<tr class="${cls}"><td>${a}</td><td style="text-align:right">${b}</td></tr>`;
+  const medios = Object.entries(c.porMedio);
+  const efectivo = c.porMedio['Efectivo'] || 0;
+  const quien = f.Modalidad === 'B'
+    ? `El elenco cobró las entradas. Transfiere a Brava <strong>$${formatNum(c.bravaTotal)}</strong> (uso de equipamiento${c.ensayo ? ' y ensayos' : ''} incluidos).`
+    : `Brava cobró las entradas. Paga al elenco <strong>$${formatNum(Math.max(0, c.elenco))}</strong> y a Argentores <strong>$${formatNum(c.arg)}</strong> dentro de los 7 días.`;
+  return `
+    <div id="bdx-print">
+      <div class="card" style="margin-bottom:1rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px">BRAVA · BORDEREAUX</div>
+        <div style="color:var(--gris-texto);font-size:.85rem">${esc(f.Obra)} · ${formatFecha(f.Fecha)} · Opción ${f.Modalidad || 'A'}</div>
+      </div>
+      <div class="table-wrap" style="margin-bottom:1rem"><table><tbody>
+        ${L(`Entradas pagas (${c.pagas.length})`, '$' + formatNum(c.rec))}
+        ${medios.map(([m, v]) => L(`<span style="color:var(--gris-texto);padding-left:1rem">· ${esc(m)}</span>`, '$' + formatNum(v))).join('')}
+        ${L(`Invitados sin cargo`, c.invitados)}
+        ${L('Argentores' + (f.Argentores === 'No' ? ' (no aplica)' : ' (10%)'), '−$' + formatNum(c.arg))}
+        ${L('<strong>Neto a repartir</strong>', '<strong>$' + formatNum(c.neto) + '</strong>')}
+        ${L(`30% sala + uso de equipamiento ($${formatNum(BDX.equipamiento)})${c.puesta ? ' + puesta de luces ($' + formatNum(BDX.puestaLuces) + ')' : ''}`, '$' + formatNum(c.porcentaje))}
+        ${L(`Seguro de sala (mínimo)${c.seguroAplica ? ' ← aplica' : ''}`, '$' + formatNum(BDX.seguro))}
+        ${num(f['Brava absorbe']) ? L('Brava absorbe', '−$' + formatNum(f['Brava absorbe'])) : ''}
+        ${L('<strong>Corresponde a Brava</strong>', '<strong style="color:var(--verde)">$' + formatNum(c.brava) + '</strong>')}
+        ${c.ensayo ? L('Ensayos', '$' + formatNum(c.ensayo)) : ''}
+        ${L('<strong>RECIBE EL ELENCO</strong>', `<strong style="font-size:1.1rem;${c.elenco < 0 ? 'color:var(--rojo)' : 'color:var(--amarillo)'}">$${formatNum(c.elenco)}</strong>`, 'bdx-total')}
+      </tbody></table></div>
+      <div class="card" style="margin-bottom:1rem;font-size:.9rem;line-height:1.7">
+        ${c.chequeo ? '✅ Cierra: Argentores + Brava + Elenco = Recaudación' : '⚠️ No cierra: revisá los montos'}<br>
+        ${f.Modalidad !== 'B' ? `💵 Efectivo que tiene que haber en caja por esta función: <strong>$${formatNum(efectivo)}</strong><br>` : ''}
+        ${quien}
+        ${c.elenco < 0 ? '<br><span style="color:var(--rojo)">El elenco recaudó menos de lo que corresponde a Brava: debe $' + formatNum(-c.elenco) + '.</span>' : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+      ${liq ? `<span class="chip chip-verde">✅ Liquidada ${f['Fecha pago'] ? 'el ' + formatFecha(f['Fecha pago']) : ''}</span>`
+            : `<button class="btn btn-primary" onclick="liquidarFuncion(${f.ID})">${f.Modalidad === 'B' ? '✅ Ya cobré a Brava' : '✅ Ya pagué al elenco y Argentores'}</button>`}
+      <button class="btn btn-ghost" onclick="imprimirBordereaux()">🖨 Imprimir / PDF</button>
+    </div>`;
+}
+
+function imprimirBordereaux() {
+  document.body.classList.add('print-bdx');
+  window.print();
+  setTimeout(() => document.body.classList.remove('print-bdx'), 500);
+}
+
+// ═════════════ ALQUILERES ═════════════
+function renderAlquileres() {
+  const el = document.getElementById('alquileres-contenido');
+  if (!el) return;
+  const sel = document.getElementById('alq-mes');
+  opcionesMeses(sel, (state.alquileres || []).map(a => a['Fecha evento']), true);
+  const mes = sel.value;
+  const rows = (state.alquileres || []).filter(a => !mes || mesDe(a['Fecha evento']) === mes)
+    .sort((a, b) => String(b['Fecha evento']).localeCompare(String(a['Fecha evento'])));
+  const cobrado = rows.filter(a => a['Fecha pago']).reduce((s, a) => s + num(a.Monto), 0);
+  const pendiente = rows.filter(a => !a['Fecha pago']).reduce((s, a) => s + num(a.Monto), 0);
+  el.innerHTML = `
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Alquileres</div><div class="stat-value">${rows.length}</div></div>
+      <div class="stat-card"><div class="stat-label">Cobrado</div><div class="stat-value verde">$${formatNum(cobrado)}</div></div>
+      <div class="stat-card"><div class="stat-label">Pendiente de cobro</div><div class="stat-value" style="color:${pendiente ? 'var(--rojo)' : 'var(--verde)'}">$${formatNum(pendiente)}</div></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha evento</th><th>Evento</th><th>Responsable</th><th>Monto</th><th>Pago</th><th></th></tr></thead>
+      <tbody>${rows.length ? rows.map(a => `
+        <tr><td>${formatFecha(a['Fecha evento'])}</td>
+          <td><strong>${esc(a.Evento)}</strong>${a.Notas ? `<div style="font-size:.72rem;color:var(--gris-texto)">${esc(a.Notas)}</div>` : ''}</td>
+          <td>${esc(a.Responsable)}</td>
+          <td style="color:var(--amarillo);font-weight:600">$${formatNum(a.Monto)}</td>
+          <td>${a['Fecha pago'] ? `<span class="chip chip-verde">Cobrado ${formatFecha(a['Fecha pago'])}</span>` : `<button class="btn btn-primary btn-sm" onclick="cobrarAlquiler(${a.ID})">Cobrar hoy</button>`}</td>
+          <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="editAlquiler(${a.ID})">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteAlquiler(${a.ID})">🗑</button></td></tr>`).join('')
+        : '<tr><td colspan="6" style="text-align:center;color:var(--gris-texto);padding:2rem">Todavía no hay alquileres</td></tr>'}
+      </tbody></table></div>`;
+}
+
+function openModalAlquiler() {
+  ['alq-id','alq-evento','alq-resp','alq-pago','alq-notas'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('alq-monto').value = ALQUILER_SUGERIDO;
+  document.getElementById('alq-fecha').value = hoyISO();
+  document.getElementById('modal-alq-title').textContent = 'NUEVO ALQUILER';
+  openModal('modal-alquiler');
+}
+function editAlquiler(id) {
+  const a = state.alquileres.find(x => String(x.ID) === String(id));
+  if (!a) return;
+  const set = (i, v) => document.getElementById(i).value = v ?? '';
+  set('alq-id', a.ID); set('alq-evento', a.Evento); set('alq-resp', a.Responsable); set('alq-monto', a.Monto);
+  set('alq-fecha', String(a['Fecha evento'] || '').slice(0, 10)); set('alq-pago', String(a['Fecha pago'] || '').slice(0, 10)); set('alq-notas', a.Notas);
+  document.getElementById('modal-alq-title').textContent = 'EDITAR ALQUILER';
+  openModal('modal-alquiler');
+}
+async function saveAlquiler() {
+  const g = i => document.getElementById(i).value;
+  const id = g('alq-id');
+  const row = { Evento: g('alq-evento').trim(), Responsable: g('alq-resp').trim(), Monto: g('alq-monto'),
+    'Fecha evento': g('alq-fecha'), 'Fecha pago': g('alq-pago'), Notas: g('alq-notas').trim() };
+  if (!row.Evento || !row.Monto) { toast('Falta el evento o el monto', 'error'); return; }
+  closeModal('modal-alquiler');
+  await api(id ? 'updateAlquiler' : 'addAlquiler', id ? { id, row } : { row });
+  toast(id ? 'Alquiler actualizado' : 'Alquiler registrado');
+  renderAlquileres();
+}
+async function cobrarAlquiler(id) {
+  await api('updateAlquiler', { id, row: { 'Fecha pago': hoyISO() } });
+  toast('Cobrado ✅'); renderAlquileres();
+}
+async function deleteAlquiler(id) {
+  if (!confirm('¿Eliminar este alquiler?')) return;
+  await api('deleteAlquiler', { id });
+  toast('Alquiler eliminado'); renderAlquileres();
+}
+
+// ═════════════ INGRESOS AUTOMÁTICOS (Gestión y Resultados) ═════════════
+function ingresosAuto() {
+  const out = [];
+  const talleres = state.talleres || [];
+  (state.movimientos || []).filter(m => m.Tipo === 'pago').forEach(m => {
+    const t = talleres.find(t => String(t.ID) === String(m.ID_Taller));
+    const pct = num(t?.['% Espacio'] || 50) / 100;
+    const al = (state.alumnos || []).find(a => String(a.ID) === String(m.ID_Alumno));
+    out.push({ fecha: String(m.Fecha || '').slice(0, 10), origen: 'Talleres', detalle: `${t ? t.Nombre : 'Taller'} · ${al ? al.Nombre : ''}`.trim(),
+      monto: num(m.Monto) * pct, bruto: num(m.Monto) });
+  });
+  (state.funciones || []).forEach(f => {
+    const c = funcCalc(f);
+    if (c.vacia) return;
+    out.push({ fecha: String(f.Fecha || '').slice(0, 10), origen: 'Teatro', detalle: `${f.Obra} (Opción ${f.Modalidad || 'A'})`,
+      monto: c.bravaTotal, pendiente: f.Estado !== 'Liquidada' && f.Modalidad === 'B' });
+  });
+  (state.alquileres || []).filter(a => a['Fecha pago']).forEach(a => {
+    out.push({ fecha: String(a['Fecha pago']).slice(0, 10), origen: 'Alquiler', detalle: `${a.Evento} · ${a.Responsable || ''}`.trim(), monto: num(a.Monto) });
+  });
+  return out.filter(x => x.fecha);
+}
+
+// ═════════════ GESTIÓN ═════════════
+function renderGestion() {
+  const el = document.getElementById('gestion-contenido');
+  if (!el) return;
+  const sel = document.getElementById('ges-mes');
+  const ing = ingresosAuto();
+  opcionesMeses(sel, [...ing.map(x => x.fecha), ...(state.egresos || []).map(e => e.Fecha)], true);
+  const mes = sel.value;
+  const ings = ing.filter(x => !mes || mesDe(x.fecha) === mes).sort((a, b) => b.fecha.localeCompare(a.fecha));
+  const egs = (state.egresos || []).filter(e => !mes || mesDe(e.Fecha) === mes).sort((a, b) => String(b.Fecha).localeCompare(String(a.Fecha)));
+  const tI = ings.reduce((s, x) => s + x.monto, 0), tE = egs.reduce((s, e) => s + num(e.Monto), 0);
+  const porOrigen = o => ings.filter(x => x.origen === o).reduce((s, x) => s + x.monto, 0);
+  el.innerHTML = `
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Ingresos</div><div class="stat-value verde">$${formatNum(tI)}</div></div>
+      <div class="stat-card"><div class="stat-label">Egresos</div><div class="stat-value" style="color:var(--rojo)">$${formatNum(tE)}</div></div>
+      <div class="stat-card" style="border-color:${tI - tE >= 0 ? 'rgba(91,194,122,.4)' : 'rgba(255,107,94,.4)'}"><div class="stat-label">Saldo</div><div class="stat-value" style="color:${tI - tE >= 0 ? 'var(--verde)' : 'var(--rojo)'}">$${formatNum(tI - tE)}</div></div>
+    </div>
+    <div class="section-title">EGRESOS</div>
+    <div class="table-wrap" style="margin-bottom:1.5rem"><table>
+      <thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Pago</th><th>Monto</th><th></th></tr></thead>
+      <tbody>${egs.length ? egs.map(e => `
+        <tr><td>${formatFecha(e.Fecha)}</td><td><strong>${esc(e.Concepto)}</strong>${e.Notas ? `<div style="font-size:.72rem;color:var(--gris-texto)">${esc(e.Notas)}</div>` : ''}</td>
+          <td><span class="chip chip-gris">${esc(e['Categoría'] || '')}</span></td><td>${esc(e.Modalidad)}</td>
+          <td style="color:var(--rojo);font-weight:600">−$${formatNum(e.Monto)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="editEgreso(${e.ID})">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEgreso(${e.ID})">🗑</button></td></tr>`).join('')
+        : '<tr><td colspan="6" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin egresos en el período</td></tr>'}
+      </tbody></table></div>
+    <div class="section-title">INGRESOS <span style="font-size:.75rem;color:var(--gris-texto);letter-spacing:0">se cargan solos desde Talleres, Teatro y Alquileres</span></div>
+    <div style="font-size:.85rem;color:var(--gris-texto);margin-bottom:.6rem">Talleres $${formatNum(porOrigen('Talleres'))} · Teatro $${formatNum(porOrigen('Teatro'))} · Alquileres $${formatNum(porOrigen('Alquiler'))}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Fecha</th><th>Origen</th><th>Detalle</th><th>Monto</th></tr></thead>
+      <tbody>${ings.length ? ings.map(x => `
+        <tr><td>${formatFecha(x.fecha)}</td><td><span class="chip ${x.origen === 'Teatro' ? 'chip-violeta' : x.origen === 'Alquiler' ? 'chip-amarillo' : 'chip-verde'}">${x.origen}</span></td>
+          <td>${esc(x.detalle)}${x.pendiente ? ' <span class="tag-precio">a cobrar</span>' : ''}</td>
+          <td style="color:var(--verde);font-weight:600">+$${formatNum(x.monto)}</td></tr>`).join('')
+        : '<tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin ingresos en el período</td></tr>'}
+      </tbody></table></div>`;
+}
+
+const CATEGORIAS_EGRESO = ['Alquiler del local', 'Servicios', 'Honorarios / sueldos', 'Equipamiento', 'Mantenimiento', 'Difusión', 'Impuestos', 'Otro'];
+function openModalEgreso() {
+  ['egreso-id','egreso-concepto','egreso-monto','egreso-notas'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('egreso-fecha').value = hoyISO();
+  document.getElementById('egreso-modalidad').value = 'Transferencia';
+  document.getElementById('modal-egreso-title').textContent = 'NUEVO EGRESO';
+  document.getElementById('egreso-categoria').innerHTML = CATEGORIAS_EGRESO.map(c => `<option>${c}</option>`).join('');
+  openModal('modal-egreso');
+  setTimeout(() => document.getElementById('egreso-concepto').focus(), 50);
+}
+function editEgreso(id) {
+  const e = state.egresos.find(x => String(x.ID) === String(id));
+  if (!e) return;
+  openModalEgreso();
+  const set = (i, v) => document.getElementById(i).value = v ?? '';
+  set('egreso-id', e.ID); set('egreso-fecha', String(e.Fecha || '').slice(0, 10)); set('egreso-concepto', e.Concepto);
+  set('egreso-monto', e.Monto); set('egreso-modalidad', e.Modalidad || 'Transferencia'); set('egreso-categoria', e['Categoría'] || 'Otro'); set('egreso-notas', e.Notas);
+  document.getElementById('modal-egreso-title').textContent = 'EDITAR EGRESO';
+}
+async function saveEgreso() {
+  const g = i => document.getElementById(i).value;
+  const id = g('egreso-id');
+  const row = { Fecha: g('egreso-fecha'), Concepto: g('egreso-concepto').trim(), Monto: g('egreso-monto'),
+    Modalidad: g('egreso-modalidad'), 'Categoría': g('egreso-categoria'), Notas: g('egreso-notas').trim() };
+  if (!row.Concepto || !row.Monto) { toast('Concepto y monto son obligatorios', 'error'); return; }
+  closeModal('modal-egreso');
+  await api(id ? 'updateEgreso' : 'addEgreso', id ? { id, row } : { row });
+  toast(id ? 'Egreso actualizado' : 'Egreso registrado');
+  renderGestion();
+}
+async function deleteEgreso(id) {
+  if (!confirm('¿Eliminar este egreso?')) return;
+  await api('deleteEgreso', { id });
+  toast('Egreso eliminado'); renderGestion();
+}
+
+// ═════════════ RESULTADOS ═════════════
+function abrirResultados() {
+  if (pinValido) { mostrarPaginaResultados(); return; }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-pin').classList.add('active');
+  document.getElementById('pin-input').value = '';
+  document.getElementById('pin-error').textContent = '';
+  setTimeout(() => document.getElementById('pin-input').focus(), 100);
+}
+function validarPin() {
+  if (document.getElementById('pin-input').value === pinSheet) { pinValido = true; mostrarPaginaResultados(); }
+  else {
     document.getElementById('pin-error').textContent = 'PIN incorrecto';
     document.getElementById('pin-input').value = '';
     setTimeout(() => document.getElementById('pin-input').focus(), 100);
   }
 }
-
 function mostrarPaginaResultados() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-resultados').classList.add('active');
-  const m = new Date().getMonth() + 1;
-  document.getElementById('res-mes').value = m;
-  document.getElementById('res-anio').value = new Date().getFullYear();
+  renderResultados();
+}
+function cerrarResultados() { pinValido = false; setModule('talleres'); }
+
+function renderResultados() {
+  const el = document.getElementById('resultados-contenido');
+  if (!el) return;
+  const selA = document.getElementById('res-anio');
+  const ing = ingresosAuto();
+  const anios = [...new Set([hoyISO().slice(0, 4), ...ing.map(x => x.fecha.slice(0, 4)), ...(state.egresos || []).map(e => String(e.Fecha).slice(0, 4))])].filter(Boolean).sort().reverse();
+  const prev = selA.value;
+  selA.innerHTML = anios.map(a => `<option>${a}</option>`).join('');
+  selA.value = anios.includes(prev) ? prev : anios[0];
+  const anio = selA.value;
+  const filas = [];
+  for (let m = 1; m <= 12; m++) {
+    const k = `${anio}-${String(m).padStart(2, '0')}`;
+    const delMes = o => ing.filter(x => mesDe(x.fecha) === k && x.origen === o).reduce((s, x) => s + x.monto, 0);
+    const t = delMes('Talleres'), te = delMes('Teatro'), al = delMes('Alquiler');
+    const eg = (state.egresos || []).filter(e => mesDe(e.Fecha) === k).reduce((s, e) => s + num(e.Monto), 0);
+    filas.push({ m, k, t, te, al, ing: t + te + al, eg, res: t + te + al - eg });
+  }
+  const tot = filas.reduce((a, f) => ({ t: a.t + f.t, te: a.te + f.te, al: a.al + f.al, ing: a.ing + f.ing, eg: a.eg + f.eg, res: a.res + f.res }), { t: 0, te: 0, al: 0, ing: 0, eg: 0, res: 0 });
+  const max = Math.max(1, ...filas.map(f => Math.max(f.ing, f.eg)));
+  const rc = v => v >= 0 ? 'var(--verde)' : 'var(--rojo)';
+
+  // Punto de equilibrio del mes actual
+  const mesAct = hoyISO().slice(0, 7);
+  const fijos = (state.costosFijos || []).reduce((s, c) => s + num(c.Monto), 0);
+  const ingMes = ing.filter(x => mesDe(x.fecha) === mesAct).reduce((s, x) => s + x.monto, 0);
+  const falta = Math.max(0, fijos - ingMes);
+  const cob = fijos > 0 ? ingMes / fijos * 100 : 0;
+  const colorPE = fijos === 0 ? 'var(--gris-texto)' : cob >= 100 ? 'var(--verde)' : cob >= 60 ? '#F2B134' : 'var(--rojo)';
+
+  el.innerHTML = `
+    <div class="section-title">PUNTO DE EQUILIBRIO · ${MESES[parseInt(mesAct.slice(5))].toUpperCase()}</div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">Costos fijos del mes</div><div class="stat-value">$${formatNum(fijos)}</div></div>
+      <div class="stat-card"><div class="stat-label">Ingresos del mes</div><div class="stat-value verde">$${formatNum(ingMes)}</div></div>
+      <div class="stat-card" style="border-color:${colorPE}"><div class="stat-label">Cobertura</div><div class="stat-value" style="color:${colorPE}">${Math.round(cob)}%</div></div>
+      <div class="stat-card"><div class="stat-label">Falta para cubrir</div><div class="stat-value" style="color:${falta ? 'var(--rojo)' : 'var(--verde)'}">$${formatNum(falta)}</div></div>
+    </div>
+    <div style="height:10px;background:var(--gris-card);border-radius:6px;overflow:hidden;margin:-.5rem 0 1rem"><div style="height:100%;width:${Math.min(100, cob)}%;background:${colorPE}"></div></div>
+    ${falta > 0 ? `<div class="card" style="margin-bottom:1rem">Para llegar al equilibrio faltan <span class="tag-precio">${Math.ceil(falta / BDX.seguro)}</span> funciones al mínimo del seguro de sala ($${formatNum(BDX.seguro)}) o <span class="tag-precio">${Math.ceil(falta / ALQUILER_SUGERIDO)}</span> alquileres de $${formatNum(ALQUILER_SUGERIDO)}.</div>` : ''}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <div style="font-weight:600">Costos fijos mensuales</div><button class="btn btn-primary btn-sm" onclick="peAgregar()">+ Agregar costo</button></div>
+    <div class="table-wrap" style="margin-bottom:2rem"><table>
+      <thead><tr><th>Concepto</th><th>Categoría</th><th>Monto</th><th></th></tr></thead>
+      <tbody>${(state.costosFijos || []).length ? state.costosFijos.map(c => `
+        <tr><td>${esc(c.Concepto)}</td><td>${esc(c['Categoría'])}</td><td>$${formatNum(c.Monto)}</td>
+          <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="peEditar(${c.ID})">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="peBorrar(${c.ID})">🗑</button></td></tr>`).join('')
+        : '<tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1.2rem">Cargá tus costos fijos (alquiler, servicios, etc.)</td></tr>'}
+      </tbody></table></div>
+
+    <div class="section-title">MES A MES · ${anio}</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Mes</th><th>Talleres</th><th>Teatro</th><th>Alquileres</th><th>Ingresos</th><th>Egresos</th><th>Resultado</th></tr></thead>
+      <tbody>${filas.map(f => `
+        <tr><td><strong>${MESES[f.m]}</strong>
+          <div style="height:4px;margin-top:4px;background:var(--verde);width:${f.ing / max * 100}%;border-radius:2px"></div>
+          <div style="height:4px;margin-top:2px;background:var(--rojo);width:${f.eg / max * 100}%;border-radius:2px"></div></td>
+          <td>$${formatNum(f.t)}</td><td>$${formatNum(f.te)}</td><td>$${formatNum(f.al)}</td>
+          <td style="color:var(--verde)">$${formatNum(f.ing)}</td><td style="color:var(--rojo)">$${formatNum(f.eg)}</td>
+          <td style="color:${rc(f.res)};font-weight:700">$${formatNum(f.res)}</td></tr>`).join('')}
+      </tbody>
+      <tfoot><tr style="font-weight:700"><td>TOTAL ${anio}</td><td>$${formatNum(tot.t)}</td><td>$${formatNum(tot.te)}</td><td>$${formatNum(tot.al)}</td>
+        <td style="color:var(--verde)">$${formatNum(tot.ing)}</td><td style="color:var(--rojo)">$${formatNum(tot.eg)}</td><td style="color:${rc(tot.res)}">$${formatNum(tot.res)}</td></tr></tfoot>
+    </table></div>`;
+}
+
+async function peAgregar() {
+  const concepto = prompt('Concepto (ej: Alquiler del local)'); if (!concepto) return;
+  const monto = parseFloat(prompt('Monto mensual ($)')); if (!monto) return;
+  await api('addCostoFijo', { row: { Concepto: concepto, 'Categoría': 'Fijo', Monto: monto } });
+  renderResultados();
+}
+async function peEditar(id) {
+  const c = state.costosFijos.find(x => String(x.ID) === String(id)); if (!c) return;
+  const concepto = prompt('Concepto', c.Concepto); if (!concepto) return;
+  const monto = parseFloat(prompt('Monto mensual ($)', c.Monto)); if (!monto) return;
+  await api('updateCostoFijo', { id, row: { Concepto: concepto, Monto: monto } });
+  renderResultados();
+}
+async function peBorrar(id) {
+  if (!confirm('¿Eliminar este costo fijo?')) return;
+  await api('deleteCostoFijo', { id });
   renderResultados();
 }
 
-function cerrarResultados() {
-  pinValido = false;
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelector('[onclick="switchModule(\'talleres\')"]').classList.add('active');
-  switchModule('talleres');
-}
-
-function renderResultadosBase() {
-  const mes = parseInt(document.getElementById('res-mes').value) || null;
-  const anio = parseInt(document.getElementById('res-anio').value) || null;
-  const container = document.getElementById('resultados-contenido');
-
-  const enPeriodo = (fecha) => {
-    if (!fecha) return false;
-    const f = parseDate(fecha);
-    if (!f) return false;
-    if (anio && f.anio !== anio) return false;
-    if (mes && f.mes !== mes) return false;
-    return true;
-  };
-
-  // ── TALLERES ──
-  const movs = (state.movimientos || []).filter(m => enPeriodo(m.Fecha) && m.Tipo === 'pago');
-  const talleres = state.talleres || [];
-
-  // Calcular ingreso al espacio por taller usando su % Espacio
-  const porTaller = {};
-  movs.forEach(m => {
-    const t = talleres.find(t => String(t.ID) === String(m.ID_Taller));
-    const nom = t ? t.Nombre : 'Sin taller';
-    const pctEspacio = parseFloat(t?.['% Espacio'] || 50) / 100;
-    if (!porTaller[nom]) porTaller[nom] = { ing: 0, pctEspacio };
-    porTaller[nom].ing += parseFloat(m.Monto || 0);
-  });
-
-  const ingTalleres = movs.reduce((s,m) => s + parseFloat(m.Monto || 0), 0);
-  const resTalleres = Object.values(porTaller).reduce((s,t) => s + t.ing * t.pctEspacio, 0);
-  const honTalleres = ingTalleres - resTalleres;
-
-  // ── EVENTOS ──
-  const eventosP = (state.eventos || []).filter(ev => enPeriodo(ev.Fecha));
-  let ingEventos = 0, egresosGastro = 0, resEventos = 0;
-
-  eventosP.forEach(ev => {
-    const precio = parseFloat(ev['Precio Entrada'] || ev['Precio entrada'] || 0);
-    const modelo = ev['Modelo de Negocio'] || (ev['% Espacio'] ? 'porcentaje' : 'gratuito');
-    const pctEspacio = parseFloat(ev['% Espacio'] || 0) / 100;
-    const totalVino = (ev.reservas || []).reduce((s,r) => s + parseInt(r['Cantidad Vino'] ?? r['Cantidad'] ?? 1), 0);
-    const puerta = parseInt(ev['Entradas Puerta'] || 0);
-    const totalAsist = totalVino + puerta;
-
-    let paraEspacio = 0;
-    if (modelo === 'porcentaje') paraEspacio = totalAsist * precio * pctEspacio;
-    else if (modelo === 'alquiler') paraEspacio = parseFloat(ev['Monto Alquiler'] || 0);
-
-    const compras = (ev.gastro_compras || []).reduce((s,c) => s + parseFloat(c['Precio Costo']||0)*parseFloat(c.Cantidad||0), 0);
-    const ventas = (ev.gastro_ventas || []).reduce((s,v) => s + parseFloat(v['Precio Venta']||0)*parseFloat(v['Cantidad Vendida']||0), 0);
-    const gastroRes = ventas - compras;
-
-    ingEventos += paraEspacio + Math.max(0, gastroRes);
-    egresosGastro += compras;
-    resEventos += paraEspacio + gastroRes;
-  });
-
-  // ── CAJA ──
-  const cajaP = (state.egresos || []).filter(e => enPeriodo(e.Fecha));
-  const ingresosExternos = cajaP.filter(e => e.Tipo === 'ingreso').reduce((s,e) => s + parseFloat(e.Monto || 0), 0);
-  const totalEgresos = cajaP.filter(e => e.Tipo !== 'ingreso').reduce((s,e) => s + parseFloat(e.Monto || 0), 0);
-
-  // ── RESULTADO FINAL ──
-  const resultadoFinal = resTalleres + resEventos + ingresosExternos - totalEgresos;
-  const meses = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-
-  window._res = {resTalleres, resEventos, ingresosExternos, totalEgresos, mes, anio, talleres};
-  container.innerHTML = `
-    <div id="pe-contenido"></div>
-    <div class="section-title">RESUMEN ${mes ? meses[mes].toUpperCase() : 'ACUMULADO'} ${anio || ''}</div>
-    <div class="stats-row">
-      <div class="stat-card" style="border-color:rgba(232,88,43,0.3)">
-        <div class="stat-label">Ingresos talleres</div>
-        <div class="stat-value amarillo">$${formatNum(resTalleres)}</div>
-        <div style="font-size:0.72rem;color:var(--gris-texto);margin-top:4px">Ing. $${formatNum(ingTalleres)} − Hon. $${formatNum(honTalleres)}</div>
-      </div>
-      <div class="stat-card" style="border-color:rgba(169,184,216,0.3)">
-        <div class="stat-label">Ingresos eventos</div>
-        <div class="stat-value" style="color:#A9B8D8">$${formatNum(resEventos)}</div>
-        <div style="font-size:0.72rem;color:var(--gris-texto);margin-top:4px">${eventosP.length} evento/s</div>
-      </div>
-      <div class="stat-card" style="border-color:rgba(91,194,122,0.3)">
-        <div class="stat-label">Ingresos externos</div>
-        <div class="stat-value verde">$${formatNum(ingresosExternos)}</div>
-        <div style="font-size:0.72rem;color:var(--gris-texto);margin-top:4px">Aportes, préstamos, etc.</div>
-      </div>
-      <div class="stat-card" style="border-color:rgba(255,107,94,0.3)">
-        <div class="stat-label">Total egresos</div>
-        <div class="stat-value" style="color:var(--rojo)">$${formatNum(totalEgresos)}</div>
-      </div>
-      <div class="stat-card" style="border-color:${resultadoFinal >= 0 ? 'rgba(91,194,122,0.4)' : 'rgba(255,107,94,0.4)'}">
-        <div class="stat-label">RESULTADO FINAL</div>
-        <div class="stat-value" style="color:${resultadoFinal >= 0 ? 'var(--verde)' : 'var(--rojo)'}">$${formatNum(resultadoFinal)}</div>
-      </div>
-    </div>
-
-    <div class="section-title">DETALLE TALLERES</div>
-    <div class="table-wrap" style="margin-bottom:1.5rem">
-      <table>
-        <thead><tr><th>Taller</th><th>Ingresos</th><th>% Espacio</th><th>Al espacio</th><th>Honorarios</th></tr></thead>
-        <tbody>
-          ${Object.entries(porTaller).length === 0
-            ? `<tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin movimientos en el período</td></tr>`
-            : Object.entries(porTaller).map(([nom, data]) => `
-              <tr>
-                <td><strong>${nom}</strong></td>
-                <td style="color:var(--amarillo)">$${formatNum(data.ing)}</td>
-                <td style="color:var(--gris-texto)">${Math.round(data.pctEspacio * 100)}%</td>
-                <td style="color:var(--verde)">$${formatNum(data.ing * data.pctEspacio)}</td>
-                <td style="color:var(--rojo)">$${formatNum(data.ing * (1 - data.pctEspacio))}</td>
-              </tr>`).join('')
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="section-title">DETALLE EVENTOS</div>
-    <div class="table-wrap" style="margin-bottom:1.5rem">
-      <table>
-        <thead><tr><th>Evento</th><th>Fecha</th><th>Entradas (espacio)</th><th>Gastro</th><th>Total espacio</th></tr></thead>
-        <tbody>
-          ${eventosP.length === 0
-            ? `<tr><td colspan="5" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin eventos en el período</td></tr>`
-            : eventosP.map(ev => {
-                const precio = parseFloat(ev['Precio Entrada'] || ev['Precio entrada'] || 0);
-                const modelo = ev['Modelo de Negocio'] || (ev['% Espacio'] ? 'porcentaje' : 'gratuito');
-                const pctEspacio = parseFloat(ev['% Espacio'] || 0) / 100;
-                const totalVino = (ev.reservas || []).reduce((s,r) => s + parseInt(r['Cantidad Vino'] ?? r['Cantidad'] ?? 1), 0);
-                const puerta = parseInt(ev['Entradas Puerta'] || 0);
-                let paraEspacio = 0;
-                if (modelo === 'porcentaje') paraEspacio = (totalVino + puerta) * precio * pctEspacio;
-                else if (modelo === 'alquiler') paraEspacio = parseFloat(ev['Monto Alquiler'] || 0);
-                const compras = (ev.gastro_compras || []).reduce((s,c) => s + parseFloat(c['Precio Costo']||0)*parseFloat(c.Cantidad||0), 0);
-                const ventas = (ev.gastro_ventas || []).reduce((s,v) => s + parseFloat(v['Precio Venta']||0)*parseFloat(v['Cantidad Vendida']||0), 0);
-                const gastroRes = ventas - compras;
-                return `
-                <tr>
-                  <td><strong>${ev.Nombre}</strong></td>
-                  <td style="color:var(--gris-texto)">${formatFecha(ev.Fecha)}</td>
-                  <td style="color:var(--amarillo)">$${formatNum(paraEspacio)}</td>
-                  <td style="color:${gastroRes >= 0 ? 'var(--verde)' : 'var(--rojo)'}">$${formatNum(gastroRes)}</td>
-                  <td style="color:var(--verde);font-weight:600">$${formatNum(paraEspacio + gastroRes)}</td>
-                </tr>`;
-              }).join('')
-          }
-        </tbody>
-      </table>
-    </div>
-
-    ${ingresosExternos > 0 ? `
-    <div class="section-title">INGRESOS EXTERNOS</div>
-    <div class="table-wrap" style="margin-bottom:1.5rem">
-      <table>
-        <thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Monto</th></tr></thead>
-        <tbody>
-          ${cajaP.filter(e => e.Tipo === 'ingreso').map(e => `
-            <tr>
-              <td>${formatFecha(e.Fecha)}</td>
-              <td>${e.Concepto}</td>
-              <td><span class="chip chip-verde">${e['Categoría'] || 'Ingreso'}</span></td>
-              <td style="color:var(--verde);font-weight:600">+$${formatNum(e.Monto)}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>` : ''}
-
-    <div class="section-title">EGRESOS</div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Fecha</th><th>Concepto</th><th>Categoría</th><th>Monto</th></tr></thead>
-        <tbody>
-          ${cajaP.filter(e => e.Tipo !== 'ingreso').length === 0
-            ? `<tr><td colspan="4" style="text-align:center;color:var(--gris-texto);padding:1.5rem">Sin egresos en el período</td></tr>`
-            : cajaP.filter(e => e.Tipo !== 'ingreso').map(e => `
-              <tr>
-                <td>${formatFecha(e.Fecha)}</td>
-                <td>${e.Concepto}</td>
-                <td><span class="chip ${catChip(e['Categoría'])}">${e['Categoría'] || 'Otro'}</span></td>
-                <td style="color:var(--rojo)">$${formatNum(e.Monto)}</td>
-              </tr>`).join('')
-          }
-        </tbody>
-      </table>
-    </div>`;
-}
 
 // ── ARRANCAR ──────────────────────────────────────────────────
 init();
