@@ -328,22 +328,26 @@ function tallerMes(t, mes) {
 // — Teatro
 const reservasDe = fid => T.Reservas.filter(r => String(r.ID_Funcion) === String(fid));
 const ingreso = r => r.Estado === 'Ingresó';
+const ajF = f => { try { return JSON.parse(f.Ajustes || '{}') || {}; } catch (e) { return {}; } };
 function funcCalc(f) {
+  const o = ajF(f), pick = (k, d) => (o[k] !== undefined && o[k] !== '' ? num(o[k]) : d);
   const rs = reservasDe(f.ID), ings = rs.filter(ingreso);
   const pagas = ings.filter(r => num(r.Monto) > 0);
   const rec = pagas.reduce((s, r) => s + num(r.Monto), 0);
   const porMedio = {};
   pagas.forEach(r => { const m = r.Medio || 'Otro'; porMedio[m] = (porMedio[m] || 0) + num(r.Monto); });
-  const arg = f.Argentores === 'No' ? 0 : rec * cfg('argentores') / 100;
+  const argPct = f.Argentores === 'No' ? 0 : pick('arg', cfg('argentores'));
+  const arg = rec * argPct / 100;
   const neto = rec - arg;
-  const puesta = (f['Primera función'] === 'Sí' && f['Técnico'] !== 'Propio') ? cfg('puesta_luces') : 0;
-  const porcentaje = neto * cfg('pct_sala') / 100 + cfg('equipamiento') + puesta;
-  const seguroAplica = cfg('seguro') > porcentaje;
-  const brava = Math.max(0, Math.max(porcentaje, cfg('seguro')) - num(f['Brava absorbe']));
+  const pctSala = pick('pct', cfg('pct_sala')), equip = pick('eq', cfg('equipamiento')), seguro = pick('seg', cfg('seguro'));
+  const puesta = pick('pl', (f['Primera función'] === 'Sí' && f['Técnico'] !== 'Propio') ? cfg('puesta_luces') : 0);
+  const porcentaje = neto * pctSala / 100 + equip + puesta;
+  const seguroAplica = seguro > porcentaje;
+  const brava = Math.max(0, Math.max(porcentaje, seguro) - num(f['Brava absorbe']));
   const ensayo = num(f['Ensayo cobrado']);
   const elenco = neto - brava - ensayo;
   const cant = a => a.reduce((s, r) => s + (num(r.Cantidad) || 1), 0);
-  return { rs, ings, rec, porMedio, arg, neto, porcentaje, puesta, seguroAplica, brava, ensayo, bravaTotal: brava + ensayo, elenco,
+  return { rs, ings, rec, porMedio, arg, argPct, neto, pctSala, equip, seguro, porcentaje, puesta, seguroAplica, brava, ensayo, bravaTotal: brava + ensayo, elenco, ov: o, editado: Object.keys(o).length > 0,
     personas: cant(rs), ingresaron: cant(ings), pagasCant: cant(pagas), invitados: cant(ings) - cant(pagas), vacia: ings.length === 0,
     chequeo: Math.round(arg + brava + ensayo + elenco) === Math.round(rec) };
 }
@@ -676,7 +680,7 @@ function vTeatro() {
   if (vista.arg) return vFuncion(vista.arg);
   const meses = [...new Set([hoy().slice(0, 7), ...T.Funciones.map(f => mesDe(f.Fecha))])].filter(Boolean).sort().reverse();
   if (teatroMes === '' || (teatroMes !== 'todos' && !meses.includes(teatroMes))) teatroMes = hoy().slice(0, 7);
-  const fs = T.Funciones.filter(f => teatroMes === 'todos' || mesDe(f.Fecha) === teatroMes).sort((a, b) => String(b.Fecha).localeCompare(String(a.Fecha)));
+  const fs = T.Funciones.filter(f => teatroMes === 'todos' || mesDe(f.Fecha) === teatroMes).sort((a, b) => String(a.Fecha).localeCompare(String(b.Fecha)) || String(a.Desde).localeCompare(String(b.Desde)));
   const rows = fs.map(f => ({ f, c: funcCalc(f) }));
   const suma = fn => rows.reduce((s, x) => s + fn(x.c), 0);
   return head('TEA<em>TRO</em>', 'Funciones, lista de ingreso y bordereaux', `<button class="btn p" onclick="formFuncion()">+ Función</button>`) + `
@@ -686,7 +690,7 @@ function vTeatro() {
     <div class="row"><div class="time" style="min-width:0">${fF(f.Fecha)}</div><span class="sp"></span><span class="chip ${f.Estado === 'Liquidada' ? 'ok' : 'warn'}">${f.Estado === 'Liquidada' ? 'Liquidada' : 'Pendiente'}</span><span class="chip vi">Op. ${f.Modalidad || 'A'}</span></div>
     <div class="h1" style="font-size:1.7rem;margin-top:.3rem">${esc(f.Obra)}</div>
     <div class="sub">${c.personas} reservas · ${c.ingresaron} ingresaron${c.vacia ? '' : ` · recaudó ${m$(c.rec)}`}</div>
-    ${c.vacia ? '' : `<div class="row" style="margin-top:.7rem"><span class="chip ok">Brava ${m$(c.bravaTotal)}</span><span class="chip in">Elenco ${m$(c.elenco)}</span>${c.seguroAplica ? '<span class="chip br">seguro de sala</span>' : ''}</div>`}</div>`).join('') || '<div class="empty card" style="grid-column:1/-1">Todavía no hay funciones en este período. Tocá “+ Función”.</div>'}</div>`;
+    ${c.vacia ? '' : `<div class="row" style="margin-top:.7rem"><span class="chip ok">Brava ${m$(c.bravaTotal)}</span><span class="chip in">Elenco ${m$(c.elenco)}</span>${c.seguroAplica ? '<span class="chip br">seguro de sala</span>' : ''}${c.editado ? '<span class="chip warn">ajustada</span>' : ''}</div>`}</div>`).join('') || '<div class="empty card" style="grid-column:1/-1">Todavía no hay funciones en este período. Tocá “+ Función”.</div>'}</div>`;
 }
 
 function funcPrefill() {
@@ -781,6 +785,7 @@ function ingresar(id, si, medio) {
 
 function bordereauxHTML(f, c) {
   const L = (a, b, cls = '') => `<tr class="${cls}"><td>${a}</td><td class="num">${b}</td></tr>`;
+  const LE = (k, a, b, f, c) => `<tr><td>${a}${c.ov[k] !== undefined ? ' <span class="chip warn">editado</span>' : ''}</td><td class="num">${b} <button class="btn s g noprint" style="padding:.15rem .5rem;min-height:0" title="Editar (pide PIN)" onclick="editarLinea(${f.ID},'${k}')">✏️</button></td></tr>`;
   const efectivo = c.porMedio['Efectivo'] || 0, liq = f.Estado === 'Liquidada';
   const quien = f.Modalidad === 'B'
     ? `El elenco cobró las entradas. Transfiere a Brava <b>${m$(c.bravaTotal)}</b> (uso de equipamiento${c.ensayo ? ' y ensayos' : ''} incluidos). Reunión de cuentas dentro de los 7 días.`
@@ -792,10 +797,13 @@ function bordereauxHTML(f, c) {
       ${L(`Entradas pagas (${c.pagasCant})`, m$(c.rec))}
       ${Object.entries(c.porMedio).map(([m, v]) => L(`<span class="mut" style="padding-left:1rem">· ${esc(m)}</span>`, m$(v))).join('')}
       ${L('Invitados sin cargo', c.invitados)}
-      ${L('Argentores' + (f.Argentores === 'No' ? ' (no aplica)' : ` (${cfg('argentores')}%)`), '−' + m$(c.arg))}
+      ${LE('arg', 'Argentores' + (f.Argentores === 'No' ? ' (no aplica)' : ` (${c.argPct}%)`), '−' + m$(c.arg), f, c)}
       ${L('<b>Neto a repartir</b>', '<b>' + m$(c.neto) + '</b>')}
-      ${L(`${cfg('pct_sala')}% sala + uso de equipamiento (${m$(cfg('equipamiento'))})${c.puesta ? ' + puesta de luces (' + m$(c.puesta) + ')' : ''}`, m$(c.porcentaje))}
-      ${L('Seguro de sala (mínimo)' + (c.seguroAplica ? ' <span class="chip br">aplica</span>' : ''), m$(cfg('seguro')))}
+      ${LE('pct', `Sala (${c.pctSala}% del neto)`, m$(c.neto * c.pctSala / 100), f, c)}
+      ${LE('eq', 'Uso de equipamiento', m$(c.equip), f, c)}
+      ${c.puesta || f['Primera función'] === 'Sí' || c.ov.pl !== undefined ? LE('pl', 'Puesta de luces (primera función)', m$(c.puesta), f, c) : ''}
+      ${L('Subtotal sala + equipamiento', m$(c.porcentaje))}
+      ${LE('seg', 'Seguro de sala (mínimo)' + (c.seguroAplica ? ' <span class="chip br">aplica</span>' : ''), m$(c.seguro), f, c)}
       ${num(f['Brava absorbe']) ? L('Brava absorbe', '−' + m$(f['Brava absorbe'])) : ''}
       ${L('<b>Corresponde a Brava</b>', `<b class="ok">${m$(c.brava)}</b>`)}
       ${c.ensayo ? L('Ensayos', m$(c.ensayo)) : ''}
@@ -809,6 +817,21 @@ function bordereauxHTML(f, c) {
   <div class="row noprint">${liq ? `<span class="chip ok">✅ Liquidada ${f['Fecha pago'] ? 'el ' + fFull(f['Fecha pago']) : ''}</span><button class="btn s g" onclick="upd('Funciones',${f.ID},{Estado:'Pendiente','Fecha pago':''});render()">Reabrir</button>`
     : `<button class="btn p" ${c.vacia ? 'disabled style="opacity:.4"' : ''} onclick="liquidar(${f.ID})">${f.Modalidad === 'B' ? '✅ Ya cobré a Brava' : '✅ Ya pagué al elenco y a Argentores'}</button>`}
     <button class="btn" onclick="window.print()">🖨 Imprimir / PDF</button></div>`;
+}
+const LINEAS = { arg: ['Argentores (%)', 'argPct'], pct: ['% de sala sobre el neto', 'pctSala'], eq: ['Uso de equipamiento ($)', 'equip'], pl: ['Puesta de luces ($)', 'puesta'], seg: ['Seguro de sala mínimo ($)', 'seguro'] };
+function editarLinea(id, k) {
+  const f = T.Funciones.find(x => String(x.ID) === String(id)), c = funcCalc(f), [lab, ck] = LINEAS[k], hay = c.ov[k] !== undefined;
+  abrirModal(`<h3>EDITAR · ${esc(lab)}</h3>
+    <div class="card" style="border-color:var(--warn);margin-bottom:1rem;line-height:1.6">⚠️ Si modificás este valor, <b>puede que las cuentas no den</b>. El cambio vale solo para esta función y corre <b>bajo tu responsabilidad</b>.</div>
+    <label class="f">Nuevo valor<input id="ea_v" inputmode="decimal" value="${c[ck]}" data-focus></label>
+    <label class="f">PIN<input id="ea_p" type="password" inputmode="numeric" onkeydown="if(event.key==='Enter')guardarLinea(${id},'${k}')"></label>
+    <div class="mfoot">${hay ? `<button class="btn d" onclick="guardarLinea(${id},'${k}',true)">Volver al valor original</button><span class="sp"></span>` : ''}<button class="btn g" onclick="cerrar()">Cancelar</button><button class="btn p" onclick="guardarLinea(${id},'${k}')">Guardar cambio</button></div>`);
+}
+function guardarLinea(id, k, reset) {
+  if ($('ea_p').value !== cfg('pin')) { toast('PIN incorrecto', true); $('ea_p').value = ''; return; }
+  const f = T.Funciones.find(x => String(x.ID) === String(id)), o = ajF(f);
+  if (reset) delete o[k]; else { const v = $('ea_v').value.trim().replace(',', '.'); if (v === '' || isNaN(Number(v))) { toast('Valor inválido', true); return; } o[k] = Number(v); }
+  upd('Funciones', id, { Ajustes: Object.keys(o).length ? JSON.stringify(o) : '' }); cerrar(); toast('Línea actualizada'); render();
 }
 function liquidar(id) {
   const f = T.Funciones.find(x => String(x.ID) === String(id)), c = funcCalc(f);
