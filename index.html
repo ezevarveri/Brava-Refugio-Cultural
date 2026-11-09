@@ -803,7 +803,7 @@ function bordereauxHTML(f, c) {
       ${LE('eq', 'Uso de equipamiento', m$(c.equip), f, c)}
       ${c.puesta || f['Primera función'] === 'Sí' || c.ov.pl !== undefined ? LE('pl', 'Puesta de luces (primera función)', m$(c.puesta), f, c) : ''}
       ${L('Subtotal sala + equipamiento', m$(c.porcentaje))}
-      ${LE('seg', 'Seguro de sala (mínimo)' + (c.seguroAplica ? ' <span class="chip br">aplica</span>' : ''), m$(c.seguro), f, c)}
+      ${c.seguroAplica || c.ov.seg !== undefined ? LE('seg', 'Seguro de sala (mínimo)' + (c.seguroAplica ? ' <span class="chip br">aplica</span>' : ''), m$(c.seguro), f, c) : ''}
       ${num(f['Brava absorbe']) ? L('Brava absorbe', '−' + m$(f['Brava absorbe'])) : ''}
       ${L('<b>Corresponde a Brava</b>', `<b class="ok">${m$(c.brava)}</b>`)}
       ${c.ensayo ? L('Ensayos', m$(c.ensayo)) : ''}
