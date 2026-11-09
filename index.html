@@ -318,11 +318,22 @@ function estadoAlumno(a, mes) {
   if (p >= c) return { k: 'ok', c, p, falta: 0 };
   return { k: p > 0 ? 'parcial' : 'debe', c, p, falta: c - p };
 }
+const docentesDe = t => {
+  let d = []; try { d = JSON.parse(t.Docentes || '[]') || []; } catch (e) {}
+  d = d.filter(x => x && x.n);
+  return d.length ? d : [{ n: t.Profesor || 'Profe', p: 100 }];
+};
 function tallerMes(t, mes) {
   const rec = T.Pagos.filter(p => String(p.ID_Taller) === String(t.ID) && p.Mes === mes).reduce((s, p) => s + num(p.Monto), 0);
   const profe = rec * num(t['% Profe']) / 100;
-  const liq = T.Liquidaciones.filter(l => String(l.ID_Taller) === String(t.ID) && l.Mes === mes).reduce((s, l) => s + num(l.Monto), 0);
-  return { rec, profe, brava: rec - profe, liq, debeProfe: Math.max(0, Math.round(profe - liq)) };
+  const liqs = T.Liquidaciones.filter(l => String(l.ID_Taller) === String(t.ID) && l.Mes === mes);
+  const docs = docentesDe(t).map((d, i) => {
+    const monto = profe * num(d.p) / 100;
+    const pagado = liqs.filter(l => (l.Docente || '') === d.n || (!l.Docente && i === 0)).reduce((s, l) => s + num(l.Monto), 0);
+    return { n: d.n, p: num(d.p), monto, pagado, debe: Math.max(0, Math.round(monto - pagado)) };
+  });
+  const liq = docs.reduce((s, d) => s + d.pagado, 0);
+  return { rec, profe, brava: rec - profe, liq, docs, debeProfe: docs.reduce((s, d) => s + d.debe, 0) };
 }
 
 // — Teatro
@@ -396,7 +407,7 @@ function pendientesCalc() {
   });
   T.Talleres.forEach(t => {
     const meses = [...new Set(T.Pagos.filter(p => String(p.ID_Taller) === String(t.ID)).map(p => p.Mes))].filter(Boolean);
-    meses.forEach(m => { const x = tallerMes(t, m); if (x.debeProfe > 0) pagar.push({ tipo: 'profe', texto: `Profe de ${t.Nombre} · ${nomMes(m)}`, monto: x.debeProfe, go: ['talleres', t.ID] }); });
+    meses.forEach(m => { const x = tallerMes(t, m); x.docs.forEach(d => { if (d.debe > 0) pagar.push({ tipo: 'profe', texto: `${x.docs.length > 1 ? d.n : 'Profe'} · ${t.Nombre} · ${nomMes(m)}`, monto: d.debe, go: ['talleres', t.ID] }); }); });
   });
   T.Egresos.filter(e => e.Estado === 'Pendiente').forEach(e => pagar.push({ tipo: 'egreso', texto: e.Concepto, monto: num(e.Monto), go: ['cuentas', 'egresos'] }));
   return { cobrar, pagar, totC: cobrar.reduce((s, x) => s + x.monto, 0), totP: pagar.reduce((s, x) => s + x.monto, 0) };
@@ -584,15 +595,20 @@ function formTaller(id) {
   const t = id ? T.Talleres.find(x => String(x.ID) === String(id)) : null;
   form(t ? 'EDITAR TALLER' : 'NUEVO TALLER', [
     { id: 'n', label: 'Nombre del taller', value: t ? t.Nombre : '' },
-    { id: 'p', label: 'Profesor/a', value: t ? t.Profesor : '' },
     { id: 'd', label: 'Días', type: 'dias', value: t ? t['Días'] : '' },
     { id: 'de', label: 'Desde', type: 'time', value: t ? hh(t.Desde) : '19:00', half: true },
     { id: 'ha', label: 'Hasta', type: 'time', value: t ? hh(t.Hasta) : '20:30', half: true },
     { id: 'c', label: 'Cuota mensual ($)', type: 'number', value: t ? t.Cuota : '', half: true },
-    { id: 'pc', label: '% para el profe', type: 'number', value: t ? t['% Profe'] : 70, half: true }
+    { id: 'pc', label: '% para el profe', type: 'number', value: t ? t['% Profe'] : 70, half: true },
+    ...[0, 1, 2, 3].flatMap(i => { const d = t ? docentesDe(t)[i] : (i === 0 ? { n: '', p: 100 } : null);
+      return [{ id: 'dn' + i, label: i === 0 ? 'Profesor/a' : 'Docente ' + (i + 1) + ' (opcional)', value: d ? d.n : '', half: true },
+              { id: 'dp' + i, label: '% de lo del profe', type: 'number', value: d ? d.p : '', ph: i === 0 ? '100' : '0', half: true }]; })
   ], v => {
     if (!v.n || !v.c) { toast('Falta el nombre o la cuota', true); return false; }
-    const row = { Nombre: v.n, Profesor: v.p, 'Días': v.d, Desde: v.de, Hasta: v.ha, Cuota: v.c, '% Profe': v.pc, Activo: 'Sí' };
+    const docs = [0, 1, 2, 3].map(i => ({ n: (v['dn' + i] || '').trim(), p: num(v['dp' + i]) })).filter(d => d.n);
+    if (docs.length > 1 && Math.round(docs.reduce((s, d) => s + d.p, 0) * 100) !== 10000) { toast('Los porcentajes de los docentes tienen que sumar 100 (ahora suman ' + docs.reduce((s, d) => s + d.p, 0) + ')', true); return false; }
+    if (docs.length === 1) docs[0].p = 100;
+    const row = { Nombre: v.n, Profesor: docs.map(d => d.n).join(' · '), Docentes: docs.length > 1 ? JSON.stringify(docs) : '', 'Días': v.d, Desde: v.de, Hasta: v.ha, Cuota: v.c, '% Profe': v.pc, Activo: 'Sí' };
     if (t) upd('Talleres', t.ID, row); else { const id = add('Talleres', row); vista = { v: 'talleres', arg: id }; }
     toast('Taller guardado'); render();
   }, t ? { borrar: () => { alumnosDe(t.ID).concat(T.Alumnos.filter(a => String(a.ID_Taller) === String(t.ID))).forEach(a => { T.Pagos.filter(p => String(p.ID_Alumno) === String(a.ID)).forEach(p => del('Pagos', p.ID)); del('Alumnos', a.ID); }); del('Talleres', t.ID); vista = { v: 'talleres', arg: null }; render(); } } : {});
@@ -611,8 +627,10 @@ function vTallerDetalle(id) {
   <div class="grid g4" style="margin-bottom:1.2rem">
     ${stat('Cobrado en el mes', m$(m.rec))}${stat('Para el profe', m$(m.profe))}${stat('Se queda en Brava', m$(m.brava), 'ok')}${stat('Alumnos que deben', deben.length, deben.length ? 'bad' : 'ok')}
   </div>
-  ${m.profe > 0 ? `<div class="card row" style="margin-bottom:1.2rem"><div>Liquidación al profe: <b>${m$(m.profe)}</b> · pagado <b>${m$(m.liq)}</b> · falta <b class="${m.debeProfe ? 'warn' : 'ok'}">${m$(m.debeProfe)}</b></div><span class="sp"></span>
-    ${m.debeProfe > 0 ? `<button class="btn ok2" onclick="pagarProfe(${t.ID})">✅ Ya le pagué al profe</button>` : '<span class="chip ok">Al día</span>'}</div>` : ''}
+  ${m.profe > 0 ? `<div class="card" style="margin-bottom:1.2rem"><div class="sub" style="margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.08em">Liquidación a ${m.docs.length > 1 ? 'los docentes' : 'el profe'} · ${m$(m.profe)}</div>
+    ${m.docs.map((d, i) => `<div class="row" style="padding:.45rem 0;border-top:1px solid var(--line)"><div><b>${esc(d.n)}</b>${m.docs.length > 1 ? ` <span class="mut">· ${d.p}%</span>` : ''}<div class="sub">${m$(d.monto)} · pagado ${m$(d.pagado)} · falta <b class="${d.debe ? 'warn' : 'ok'}">${m$(d.debe)}</b></div></div><span class="sp"></span>
+      ${d.debe > 0 ? `<button class="btn ok2" onclick="pagarProfe(${t.ID},${i})">✅ Ya le pagué</button>` : '<span class="chip ok">Al día</span>'}</div>`).join('')}
+    ${m.docs.length > 1 && m.docs.filter(d => d.debe > 0).length > 1 ? `<div style="margin-top:.6rem"><button class="btn ok2" onclick="pagarProfe(${t.ID},'all')">✅ Ya les pagué a todos</button></div>` : ''}</div>` : ''}
   <div class="card"><div class="list">${est.length ? est.map(({ a, e }) => `<div class="item">
       <div style="flex:1;min-width:160px;cursor:pointer" onclick="historial(${a.ID})"><div class="t">${esc(a.Nombre)}</div><div class="d">${esc(a['Teléfono'] || '')}${a['Cuota propia'] !== '' && a['Cuota propia'] != null ? ` · cuota propia ${m$(a['Cuota propia'])}` : ''}</div></div>
       ${e.k === 'ok' ? `<span class="chip ok">Pagó ${m$(e.p)}</span>` : e.k === 'beca' ? '<span class="chip vi">Beca</span>' : e.k === 'parcial' ? `<span class="chip warn">Pagó ${m$(e.p)} · falta ${m$(e.falta)}</span>` : `<span class="chip bad">Debe ${m$(e.falta)}</span>`}
@@ -667,10 +685,12 @@ function historial(aid) {
     <div class="mfoot"><button class="btn" onclick="cerrar()">Cerrar</button></div>`);
 }
 
-function pagarProfe(tid) {
+function pagarProfe(tid, idx) {
   const t = T.Talleres.find(x => String(x.ID) === String(tid)), m = tallerMes(t, mesTaller);
-  if (!confirm(`¿Confirmás que le pagaste ${m$(m.debeProfe)} a ${t.Profesor || 'el profe'} por ${nomMes(mesTaller)}?`)) return;
-  add('Liquidaciones', { ID_Taller: t.ID, Mes: mesTaller, Monto: m.debeProfe, 'Fecha pago': hoy() });
+  const ds = (idx === 'all' ? m.docs : [m.docs[idx]]).filter(d => d.debe > 0);
+  if (!ds.length) return;
+  if (!confirm(`¿Confirmás que pagaste ${ds.map(d => `${m$(d.debe)} a ${d.n}`).join(' y ')} por ${nomMes(mesTaller)}?`)) return;
+  ds.forEach(d => add('Liquidaciones', { ID_Taller: t.ID, Mes: mesTaller, Docente: d.n, Monto: d.debe, 'Fecha pago': hoy() }));
   toast('Liquidación registrada'); render();
 }
 
